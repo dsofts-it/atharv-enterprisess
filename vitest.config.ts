@@ -1,0 +1,2 @@
+import {defineConfig} from 'vitest/config';
+export default defineConfig({test:{include:['server/tests/**/*.test.ts','client/tests/**/*.test.tsx'],testTimeout:60000,hookTimeout:180000,fileParallelism:false,env:{NODE_ENV:'test',MONGODB_URI:'mongodb://127.0.0.1:27017/test',JWT_ACCESS_SECRET:'test-only-secret-with-more-than-forty-eight-characters-123456789',CLIENT_URL:'http://127.0.0.1:5173',MONGOMS_DOWNLOAD_DIR:'node_modules/.cache/mongodb-memory-server'}}});

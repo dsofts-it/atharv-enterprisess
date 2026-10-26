@@ -1,0 +1,128 @@
+{
+  "home-nursing": {
+    "src": "/images/illustrations/home-nursing.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "home-nursing"
+  },
+  "elderly-care": {
+    "src": "/images/illustrations/elderly-care.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "elderly-care"
+  },
+  "patient-attendant": {
+    "src": "/images/illustrations/patient-attendant.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "patient-attendant"
+  },
+  "post-operative-care": {
+    "src": "/images/illustrations/post-operative-care.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "post-operative-care"
+  },
+  "24-hour-care": {
+    "src": "/images/illustrations/24-hour-care.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "24-hour-care"
+  },
+  "bedridden-care": {
+    "src": "/images/illustrations/bedridden-care.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "bedridden-care"
+  },
+  "family": {
+    "src": "/images/illustrations/family.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "family"
+  },
+  "booking": {
+    "src": "/images/illustrations/booking.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "booking"
+  },
+  "verification": {
+    "src": "/images/illustrations/verification.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "verification"
+  },
+  "scheduling": {
+    "src": "/images/illustrations/scheduling.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "scheduling"
+  },
+  "coordination": {
+    "src": "/images/illustrations/coordination.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "coordination"
+  },
+  "trust": {
+    "src": "/images/illustrations/trust.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "trust"
+  },
+  "welcome": {
+    "src": "/images/illustrations/welcome.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "welcome"
+  },
+  "caregiver": {
+    "src": "/images/illustrations/caregiver.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "caregiver"
+  },
+  "empty-booking": {
+    "src": "/images/illustrations/empty-booking.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "empty-booking"
+  },
+  "notification": {
+    "src": "/images/illustrations/notification.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "notification"
+  },
+  "invoice": {
+    "src": "/images/illustrations/invoice.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "invoice"
+  },
+  "contact": {
+    "src": "/images/illustrations/contact.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "contact"
+  },
+  "team": {
+    "src": "/images/illustrations/team.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "team"
+  },
+  "faq": {
+    "src": "/images/illustrations/faq.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "faq"
+  },
+  "journey": {
+    "src": "/images/illustrations/journey.svg",
+    "kind": "Original code-native SVG illustration",
+    "subjects": "Fictional illustrative people",
+    "use": "journey"
+  }
+}

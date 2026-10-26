@@ -1,0 +1,92 @@
+{
+  "home-nursing": {
+    "src": "/images/editorial/home-nursing.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "home-nursing"
+  },
+  "elderly-care": {
+    "src": "/images/editorial/elderly-care.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "elderly-care"
+  },
+  "patient-attendant": {
+    "src": "/images/editorial/patient-attendant.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "patient-attendant"
+  },
+  "post-operative-care": {
+    "src": "/images/editorial/post-operative-care.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "post-operative-care"
+  },
+  "24-hour-care": {
+    "src": "/images/editorial/24-hour-care.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "24-hour-care"
+  },
+  "bedridden-care": {
+    "src": "/images/editorial/bedridden-care.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "bedridden-care"
+  },
+  "family-home": {
+    "src": "/images/editorial/family-home.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "family-home"
+  },
+  "personal-plan": {
+    "src": "/images/editorial/personal-plan.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "personal-plan"
+  },
+  "quote-review": {
+    "src": "/images/editorial/quote-review.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "quote-review"
+  },
+  "team-handover": {
+    "src": "/images/editorial/team-handover.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "team-handover"
+  },
+  "connected-care": {
+    "src": "/images/editorial/connected-care.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "connected-care"
+  },
+  "credential-review": {
+    "src": "/images/editorial/credential-review.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "credential-review"
+  },
+  "family-feedback": {
+    "src": "/images/editorial/family-feedback.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "family-feedback"
+  },
+  "portal-connected": {
+    "src": "/images/editorial/portal-connected.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "portal-connected"
+  },
+  "care-questions": {
+    "src": "/images/editorial/care-questions.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "care-questions"
+  },
+  "care-conversation": {
+    "src": "/images/editorial/care-conversation.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "care-conversation"
+  },
+  "care-heart": {
+    "src": "/images/editorial/care-heart.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "care-heart"
+  },
+  "care-continuity": {
+    "src": "/images/editorial/care-continuity.svg",
+    "provenance": "Original project-native vector artwork",
+    "use": "care-continuity"
+  }
+}

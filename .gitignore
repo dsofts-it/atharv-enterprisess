@@ -1,0 +1,12 @@
+node_modules/
+dist/
+dist-server/
+.env
+.env.*.local
+coverage/
+test-results/
+playwright-report/
+.runtime/
+.runtime-recovered/
+*.log
+.cache/
