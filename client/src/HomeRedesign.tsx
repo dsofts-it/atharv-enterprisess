@@ -35,6 +35,12 @@ import { services, faqs, areas } from "../../shared/catalog";
 import { api } from "./api";
 import { CTA, ErrorState } from "./components";
 import { Reveal, Illustration, journey } from "./Visual";
+import {
+  careViewport,
+  cardReveal,
+  illustrationReveal,
+  sectionReveal,
+} from "./careMotion";
 export const icons = [HeartPulse, Sun, HandHeart, Activity, Moon, BedDouble];
 const extraQuestions = [
   [
@@ -59,6 +65,7 @@ const extraQuestions = [
   ],
 ];
 export function ServiceCards({ limit = 6 }: { limit?: number }) {
+  const reduced = useReducedMotion();
   const { data: catalog = services, error } = useQuery({
     queryKey: ["services"],
     queryFn: () => api<typeof services>("/services"),
@@ -66,23 +73,41 @@ export function ServiceCards({ limit = 6 }: { limit?: number }) {
   });
   if (error) return <ErrorState error={error} />;
   return (
-    <div className="service-gallery">
+    <div className="service-gallery premium-services">
       {catalog.slice(0, limit).map((s, i) => {
         const Icon = icons[i % icons.length];
         return (
-          <Reveal key={s.slug} delay={(i % 3) * 0.07}>
+          <motion.div
+            key={s.slug}
+            data-scroll-motion
+            initial={false}
+            whileInView="visible"
+            viewport={careViewport}
+            variants={cardReveal}
+            custom={reduced ? -1 : (i % 3) * 0.1}
+          >
             <article className={`visual-service visual-service-${i}`}>
               <Link
                 className="service-art"
                 to={`/services/${s.slug}`}
                 aria-label={`Explore ${s.name}`}
               >
-                <Illustration
-                  name={s.slug}
-                  alt={`Illustration of ${s.name.toLowerCase()}, fictional people`}
-                />
-                <span className="art-orbit" />
-                <span className="service-art-icon">
+                <motion.div
+                  className="service-illustration"
+                  variants={illustrationReveal}
+                  custom={reduced ? -1 : (i % 3) * 0.1}
+                >
+                  <img
+                    className="care-illustration"
+                    src={`/images/editorial/${s.slug}.svg`}
+                    alt={`Illustration of ${s.name.toLowerCase()}, fictional people`}
+                    width={520}
+                    height={360}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </motion.div>
+                <span className="service-art-icon" aria-hidden="true">
                   <Icon size={20} />
                 </span>
               </Link>
@@ -93,8 +118,14 @@ export function ServiceCards({ limit = 6 }: { limit?: number }) {
                 </h3>
                 <p>{s.summary}</p>
                 <div className="service-links">
-                  <Link to={`/services/${s.slug}`}>
-                    Learn more <ArrowUpRight size={16} />
+                  <Link
+                    to={`/services/${s.slug}`}
+                    aria-label={`Learn more about ${s.name.toLowerCase()}`}
+                  >
+                    Learn more{" "}
+                    <span className="service-arrow" aria-hidden="true">
+                      <ArrowUpRight size={17} />
+                    </span>
                   </Link>
                   <Link
                     to={`/request-care?service=${s.slug}`}
@@ -106,7 +137,7 @@ export function ServiceCards({ limit = 6 }: { limit?: number }) {
                 </div>
               </div>
             </article>
-          </Reveal>
+          </motion.div>
         );
       })}
     </div>
@@ -434,15 +465,15 @@ export default function Home() {
       </section>
       <section className="section container" id="services">
         <Reveal className="section-heading">
-          <div>
+          <motion.div variants={sectionReveal} custom={reduced ? -1 : 0}>
             <p className="eyebrow">CARE FOR EVERY CHAPTER</p>
             <h2>
               Different needs.
               <br />
               <em>The same human touch.</em>
             </h2>
-          </div>
-          <div>
+          </motion.div>
+          <motion.div variants={sectionReveal} custom={reduced ? -1 : 0.12}>
             <p>
               From a helping hand with everyday life to qualified nursing
               support. Find a place to begin, and we’ll work out the details
@@ -451,7 +482,7 @@ export default function Home() {
             <Link className="text-link" to="/services">
               Discover our services <ArrowUpRight size={17} />
             </Link>
-          </div>
+          </motion.div>
         </Reveal>
         <ServiceCards />
         <Reveal className="service-footnote">

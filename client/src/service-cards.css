@@ -1,0 +1,181 @@
+/* Service collection: scoped so unrelated cards retain their existing styles. */
+.service-gallery.premium-services {
+  gap: 26px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.premium-services > div {
+  display: flex;
+  min-width: 0;
+}
+.premium-services .visual-service {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid #dce7e1;
+  box-shadow: 0 4px 16px #173f4006;
+  transition:
+    transform 250ms var(--ease-care),
+    border-color 250ms,
+    box-shadow 250ms;
+}
+.premium-services .service-art {
+  height: auto;
+  aspect-ratio: 1.85;
+  padding: 12px 30px;
+  background: #edf4ef;
+  border-bottom: 1px solid #e1eae5;
+  transition: background-color 250ms;
+}
+.premium-services .visual-service-1 .service-art,
+.premium-services .visual-service-5 .service-art {
+  background: #eef3e9;
+}
+.premium-services .visual-service-2 .service-art,
+.premium-services .visual-service-4 .service-art {
+  background: #edf3f7;
+}
+.premium-services .visual-service-3 .service-art {
+  background: #eaf3f1;
+}
+.premium-services .service-illustration {
+  height: 100%;
+  width: 100%;
+}
+.premium-services .service-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.premium-services .service-art-icon {
+  color: #386c60;
+  width: 32px;
+  height: 32px;
+  right: 14px;
+  bottom: 12px;
+  background: #ffffffdc;
+}
+.premium-services .service-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+}
+.premium-services .service-body > small {
+  font-size: 11px;
+  letter-spacing: 1.25px;
+  line-height: 1.6;
+  font-weight: 700;
+  color: #427065;
+}
+.premium-services .service-body h3 {
+  font-size: clamp(20px, 1.8vw, 24px);
+  line-height: 1.35;
+  margin: 9px 0 12px;
+  letter-spacing: -0.6px;
+}
+.premium-services .service-body > p {
+  min-height: 0;
+  font-size: 15px;
+  line-height: 1.75;
+  margin: 0 0 23px;
+  color: #526761;
+}
+.premium-services .service-links {
+  margin-top: auto;
+  padding-top: 16px;
+  gap: 12px;
+  border-color: #e7ede9;
+}
+.premium-services .service-links > a:first-child {
+  flex: 1;
+  justify-content: space-between;
+  font-size: 14px;
+  min-height: 44px;
+}
+.premium-services .service-arrow,
+.premium-services .service-book {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #eff5f1;
+  color: #286658;
+  transition:
+    background-color 250ms,
+    color 250ms;
+}
+.premium-services .service-book {
+  background: transparent;
+  border: 1px solid #dce7e1;
+}
+.premium-services a:focus-visible {
+  outline: 3px solid #287866;
+  outline-offset: 4px;
+  border-radius: 5px;
+}
+/* Neutralize inherited hover transforms on touchscreens. */
+.premium-services .visual-service:hover,
+.premium-services .visual-service:hover .service-art img,
+.premium-services .service-links > a:hover svg {
+  transform: none;
+}
+@media (hover: hover) and (pointer: fine) {
+  .premium-services .visual-service:hover {
+    transform: translateY(-5px);
+    border-color: #91b7a6;
+    box-shadow: 0 12px 28px #173f4012;
+  }
+  .premium-services .visual-service:hover .service-art {
+    background: #e4eeea;
+  }
+  .premium-services .visual-service:hover .service-art img {
+    transform: scale(1.025);
+  }
+  .premium-services .visual-service:hover .service-arrow {
+    background: #286658;
+    color: #fff;
+  }
+  .premium-services .visual-service:hover .service-arrow svg {
+    transform: translate(2px, -2px);
+  }
+  .premium-services .service-book:hover {
+    background: #e7f0ea;
+  }
+}
+@media (max-width: 1023px) {
+  .service-gallery.premium-services {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+}
+@media (max-width: 599px) {
+  .service-gallery.premium-services {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+  .premium-services .service-body {
+    padding: 22px;
+  }
+  .premium-services .service-art {
+    aspect-ratio: 1.9;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .premium-services *,
+  .premium-services *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+  .premium-services .visual-service:hover,
+  .premium-services .visual-service:hover .service-art img,
+  .premium-services .service-illustration,
+  .premium-services .service-arrow svg {
+    transform: none !important;
+  }
+}

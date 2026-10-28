@@ -2,12 +2,12 @@ import {
   motion,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "motion/react";
 import { useRef, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
+import { careViewport, sectionReveal } from "./careMotion";
 export function Reveal({
   children,
   className = "",
@@ -18,60 +18,22 @@ export function Reveal({
   delay?: number;
 }) {
   const reduced = useReducedMotion();
-  const target = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target,
-    offset: ["start end", "end start"],
-  });
-  const travel = useTransform(scrollYProgress, [0, 0.5, 1], [24, 0, -24]);
-  const y = useSpring(travel, { stiffness: 140, damping: 30, mass: 0.25 });
-  const variant = /art|visual|gallery/.test(className)
-    ? "scale"
-    : /heading|copy/.test(className)
-      ? "left"
-      : "rise";
   return (
     <motion.div
-      ref={target}
       data-care-reveal
       data-scroll-motion
-      data-motion-variant={variant}
       className={className}
-      style={{ y: reduced ? 0 : y }}
-      initial={
-        reduced
-          ? false
-          : {
-              opacity: 0,
-              x: variant === "left" ? -16 : 0,
-              scale: variant === "scale" ? 0.97 : 1,
-            }
-      }
-      whileInView={{ opacity: 1, x: 0, scale: 1 }}
-      viewport={{ once: false, amount: 0.1, margin: "0px 0px -10px 0px" }}
-      onViewportEnter={(entry) => {
-        if (entry) {
-          const element = entry.target as HTMLElement;
-          element.dataset.revealState = "visible";
-          element.dataset.revealCount = String(
-            Number(element.dataset.revealCount || 0) + 1,
-          );
-        }
-      }}
-      onViewportLeave={(entry) => {
-        if (entry)
-          (entry.target as HTMLElement).dataset.revealState = "outside";
-      }}
-      transition={{
-        duration: 0.65,
-        delay: Math.min(delay, 0.18),
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      initial={false}
+      whileInView="visible"
+      viewport={careViewport}
+      variants={sectionReveal}
+      custom={reduced ? -1 : delay}
     >
       {children}
     </motion.div>
   );
 }
+
 export function Illustration({
   name,
   alt = "",
@@ -87,9 +49,7 @@ export function Illustration({
     target,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(scrollYProgress, [0, 1], [18, -18]);
-  const rotate = useTransform(scrollYProgress, [0, 1], [-1.5, 1.5]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.98, 1.02, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [8, -8]);
   const editorial = new Set([
     "home-nursing",
     "elderly-care",
@@ -114,7 +74,7 @@ export function Illustration({
     <motion.img
       ref={target}
       data-scroll-art
-      style={reduced ? { y: 0, rotate: 0, scale: 1 } : { y, rotate, scale }}
+      style={{ y: reduced ? 0 : y }}
       className={`care-illustration ${className}`}
       src={`/images/${editorial.has(name) ? "editorial" : "illustrations"}/${name}.svg`}
       alt={alt}
