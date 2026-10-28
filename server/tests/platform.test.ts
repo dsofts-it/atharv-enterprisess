@@ -74,15 +74,31 @@ describe("public access and authentication", () => {
       ).status,
     ).toBe(401);
   });
-  it("rejects untrusted mutation origins", async () => {
+  it("allows preflight requests from any frontend origin with cookies", async () => {
+    for (const frontend of [
+      "https://atharv-enterprises-8uv.pages.dev",
+      "https://another-frontend.example.test",
+    ]) {
+      const response = await request(app)
+        .options("/api/v1/auth/login")
+        .set("Origin", frontend)
+        .set("Access-Control-Request-Method", "POST")
+        .set("Access-Control-Request-Headers", "content-type");
+      expect(response.status).toBe(204);
+      expect(response.headers["access-control-allow-origin"]).toBe(frontend);
+      expect(response.headers["access-control-allow-credentials"]).toBe("true");
+      expect(response.headers.vary).toContain("Origin");
+    }
+  });
+  it("keeps authentication required for mutations from other origins", async () => {
     expect(
       (
         await request(app)
-          .post("/api/v1/auth/login")
+          .post("/api/v1/portal/bookings")
           .set("Origin", "https://untrusted.test")
           .send({})
       ).status,
-    ).toBe(403);
+    ).toBe(401);
   });
   it("does not allow privileged self-registration", async () => {
     expect(

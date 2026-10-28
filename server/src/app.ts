@@ -61,18 +61,12 @@ app.use(
     },
   }),
 );
-app.use(cors({ origin: config.CLIENT_URL, credentials: true }));
+// Reflect the requesting origin: wildcard origins cannot be used with cookies.
+app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: "32kb" }));
 app.use(cookieParser());
 app.use("/api", (req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
-  if (
-    !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
-    req.headers.origin !== config.CLIENT_URL
-  )
-    return res
-      .status(403)
-      .json({ error: { message: "Request origin is not trusted" } });
   next();
 });
 app.use(
