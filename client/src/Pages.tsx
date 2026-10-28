@@ -523,10 +523,10 @@ export function RequestCare() {
       new URLSearchParams(location.search).get("service") ||
       sessionStorage.getItem("care-service") ||
       "elderly-care",
-    shift: "Day",
-    duration: 7,
+    shift: sessionStorage.getItem("care-shift") || "Day",
+    duration: Number(sessionStorage.getItem("care-duration")) || 7,
     locality: sessionStorage.getItem("care-locality") || "",
-    startDate: "",
+    startDate: sessionStorage.getItem("care-start-date") || "",
     preferredName: "",
     instructions: "",
     consent: false,
@@ -543,6 +543,9 @@ export function RequestCare() {
       if (!user) {
         sessionStorage.setItem("care-service", data.service);
         sessionStorage.setItem("care-locality", data.locality);
+        sessionStorage.setItem("care-shift", data.shift);
+        sessionStorage.setItem("care-duration", String(data.duration));
+        sessionStorage.setItem("care-start-date", data.startDate);
         sessionStorage.setItem("care-return", "/request-care");
         navigate("/login");
         return;
@@ -566,6 +569,9 @@ export function RequestCare() {
         setReference(b.reference);
         sessionStorage.removeItem("care-service");
         sessionStorage.removeItem("care-locality");
+        sessionStorage.removeItem("care-shift");
+        sessionStorage.removeItem("care-duration");
+        sessionStorage.removeItem("care-start-date");
       } catch (e) {
         setError((e as Error).message);
       } finally {
@@ -597,7 +603,9 @@ export function RequestCare() {
         title="Tell us what care looks like for you."
       >
         A few details help us understand where to start. No payment is taken
-        with your request.
+        with your request. Not sure where to begin?{" "}
+        <Link to="/find-care">Use our care guide</Link> or{" "}
+        <Link to="/contact">ask the team without an account</Link>.
       </PageIntro>
       <section className="container booking-layout">
         <aside>
@@ -692,8 +700,8 @@ export function RequestCare() {
                   {!user && (
                     <p className="notice">
                       Next, we’ll ask you to sign in or create an account to
-                      protect your detailed request. Your service and locality
-                      choices will be kept.
+                      protect your detailed request. Your service, locality,
+                      date, shift and duration choices will be kept.
                     </p>
                   )}
                 </>

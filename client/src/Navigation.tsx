@@ -64,8 +64,8 @@ export default function Navigation() {
             <MapPin size={13} /> Thoughtful care, closer to home.
             <b>{settings?.location || "Pune, Maharashtra"}</b>
           </span>
-          <Link to="/contact">
-            Let’s find your next step <ArrowUpRight size={13} />
+          <Link to="/find-care">
+            New here? Find your care <ArrowUpRight size={13} />
           </Link>
         </div>
       </motion.div>
@@ -133,6 +133,7 @@ export default function Navigation() {
               </AnimatePresence>
             </div>
             <NavLink to="/how-it-works">How it works</NavLink>
+            <NavLink to="/find-care">Find care</NavLink>
             <NavLink to="/contact">Contact</NavLink>
             <NavLink to="/portal" className="mobile-only">
               My care portal

@@ -359,7 +359,7 @@ export default function Home() {
                 clear communication at every step.
               </p>
               <div className="hero-buttons">
-                <Link to="/request-care" className="button">
+                <Link to="/find-care" className="button">
                   Find the right care <ArrowUpRight size={18} />
                 </Link>
                 <Link to="/services" className="button secondary">

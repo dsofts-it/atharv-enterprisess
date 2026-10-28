@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { Header, Footer, Loading } from "./components";
 import Home from "./Home";
+import FindCare from "./FindCare";
 import { ScrollProgress } from "./ScrollProgress";
 import {
   Services,
@@ -57,6 +58,7 @@ export default function App() {
         <Suspense fallback={<Loading />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/find-care" element={<FindCare />} />
             <Route path="/services" element={<Services />} />
             <Route path="/services/:slug" element={<ServiceDetail />} />
             <Route path="/about" element={<About />} />
