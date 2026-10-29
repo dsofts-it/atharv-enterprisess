@@ -34,8 +34,17 @@ export async function api<T = any>(
   ) {
     if (await refreshSession()) response = await send();
   }
-  const body = await response.json();
-  if (!response.ok)
+  const body = await response
+    .json()
+    .catch(() => ({
+      error: {
+        message:
+          response.status === 429
+            ? "Too many requests. Please wait a minute and try again."
+            : "The care service is unavailable. Please try again shortly.",
+      },
+    }));
+  if (!response.ok || body.error)
     throw new Error(body.error?.message || "Unable to complete your request");
   return body.data;
 }

@@ -1,5 +1,7 @@
 # Atharv Enterprises Nursing & Home Care
 
+The 29 October healthcare upgrade adds realistic illustrative photography, English/Hindi/Marathi client pages, expanded enquiries and owner content/service tools. See [audit and feature gap report](docs/healthcare-upgrade-audit.md), [photography provenance](docs/healthcare-photography.md), and the current [Cloudflare frontend + Render backend guide](docs/cloudflare-render-healthcare.md).
+
 For a Render backend Web Service and frontend Static Site, follow the [complete Render deployment guide](docs/render-deployment.md). It includes the exact build settings, Atlas configuration, cookies/custom domains, and first-owner setup for this repository.
 
 The visual redesign includes an illustrated homepage, full portal sign-in, role-specific dashboards and a local asset library. See [redesign notes and asset manifest](docs/redesign.md) for the design, motion, provenance and validation details. Normal startup commands below are unchanged.

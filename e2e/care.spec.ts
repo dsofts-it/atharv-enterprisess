@@ -4,11 +4,14 @@ test("public browsing, progressive sign-in and private care request", async ({
 }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("heading", { name: /Care that feels/ }),
+    page.getByRole("heading", { name: /Compassionate care/ }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: "Find the right care", exact: true })
+    .getByRole("link", { name: "Help me choose care", exact: true })
     .click();
+  await page.getByRole("radio", { name: /Home nursing/ }).check();
+  await page.getByRole("link", { name: "View details", exact: true }).click();
+  await page.getByRole("link", { name: "Make a private care request" }).click();
   await page.getByLabel("Pune locality").selectOption("Baner");
   await page.getByLabel("Preferred start date").fill("2030-01-01");
   await page.getByRole("button", { name: "Continue", exact: true }).click();
@@ -51,14 +54,14 @@ test("mobile navigation, reduced motion and no horizontal overflow", async ({
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await page.getByRole("button", { name: "Open menu" }).click();
+  await page.getByRole("button", { name: "Open navigation" }).click();
   await page
     .getByRole("navigation", { name: "Main navigation" })
-    .getByRole("link", { name: "Our services" })
+    .getByRole("link", { name: "Services", exact: true })
     .click();
   await expect(
     page.getByRole("heading", {
-      name: "The right support makes all the difference.",
+      name: "Find support that fits your needs.",
     }),
   ).toBeVisible();
   expect(
@@ -77,13 +80,13 @@ test("desktop homepage and service detail", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/");
-  await expect(page.locator(".hero-copy")).toHaveCSS("opacity", "1");
+  await expect(page.locator(".hc-hero h1")).toBeVisible();
   await page
-    .locator(".hero-photo img")
+    .locator(".hc-hero-image img")
     .evaluate((img: HTMLImageElement) => img.decode());
   expect(
     await page
-      .locator(".hero-photo img")
+      .locator(".hc-hero-image img")
       .evaluate((img: HTMLImageElement) => img.naturalWidth),
   ).toBeGreaterThan(0);
   await page.screenshot({
@@ -94,13 +97,8 @@ test("desktop homepage and service detail", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Home nursing", exact: true }),
   ).toBeVisible();
-  await page
-    .getByText("What is the difference between a nurse and an attendant?")
-    .click();
   await expect(
-    page.getByText("Qualified nurses may perform authorized clinical tasks.", {
-      exact: false,
-    }),
+    page.getByRole("heading", { name: "Scope and scheduling" }),
   ).toBeVisible();
   expect(errors).toEqual([]);
 });

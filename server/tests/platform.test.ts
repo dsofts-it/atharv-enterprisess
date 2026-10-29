@@ -12,6 +12,10 @@ import {
   Audit,
   Service,
   Invoice,
+  Inquiry,
+  Notification,
+  Content,
+  Media,
   models,
 } from "../src/models.js";
 import {
@@ -59,6 +63,252 @@ afterAll(async () => {
   await repl?.stop();
 });
 describe("public access and authentication", () => {
+  it("persists an enquiry without email, prevents retry duplicates and notifies owners", async () => {
+    const input = {
+      name: "Fictional Enquiry",
+      phone: "9876543210",
+      service: "home-nursing",
+      locality: "Baner",
+      city: "Pune",
+      startDate: "2030-01-15",
+      preferredShift: "Flexible",
+      careDuration: "weekly",
+      language: "mr",
+      consent: true,
+      requestId: "ab041546-3835-4ec2-bcf9-1dc769264b17",
+      website: "",
+    };
+    const first = await request(app)
+      .post("/api/v1/public/inquiries")
+      .send(input);
+    expect(first.status).toBe(201);
+    expect(first.body.data.reference).toMatch(/^ENQ-/);
+    const retry = await request(app)
+      .post("/api/v1/public/inquiries")
+      .send(input);
+    expect(retry.body.data.reference).toBe(first.body.data.reference);
+    expect(await Inquiry.countDocuments({ requestId: input.requestId })).toBe(
+      1,
+    );
+    expect(
+      await Notification.countDocuments({
+        userId: owner._id,
+        title: "A new care enquiry is ready for review.",
+      }),
+    ).toBe(1);
+  });
+  it("rejects invalid mobile numbers, spam and unavailable services", async () => {
+    const input = {
+      name: "Fictional Enquiry",
+      phone: "9876543210",
+      service: "home-nursing",
+      locality: "Baner",
+      consent: true,
+    };
+    for (const invalid of [
+      { phone: "1234567890" },
+      { website: "spam.example" },
+      { service: "unpublished-service" },
+    ]) {
+      expect(
+        (
+          await request(app)
+            .post("/api/v1/public/inquiries")
+            .send({ ...input, ...invalid })
+        ).status,
+      ).toBe(400);
+    }
+  });
+  it("protects enquiry records and allows audited owner follow-up", async () => {
+    expect((await alice.get("/api/v1/admin/inquiries")).status).toBe(403);
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .set("Origin", origin)
+      .send({ email: owner.email, password: "not-used-in-production" });
+    const rows = await agent.get(
+      "/api/v1/admin/inquiries?search=Fictional%20Enquiry",
+    );
+    expect(rows.status).toBe(200);
+    const inquiry = rows.body.data[0];
+    expect(inquiry).toBeTruthy();
+    const updated = await agent
+      .patch(`/api/v1/admin/inquiries/${inquiry._id}`)
+      .send({
+        status: "follow-up",
+        assignedTo: String(owner._id),
+        note: "Fictional follow-up only",
+      });
+    expect(updated.status).toBe(200);
+    expect(updated.body.data.notes[0].text).toBe("Fictional follow-up only");
+    expect(
+      (await agent.get("/api/v1/admin/inquiry-analytics")).body.data.total,
+    ).toBe(1);
+    const csv = await agent.get("/api/v1/admin/inquiries-export");
+    expect(csv.status).toBe(200);
+    expect(csv.text).not.toContain("9876543210");
+    expect(csv.text).not.toContain("Fictional follow-up only");
+  });
+  it("keeps content drafts private and restricts marketing image uploads", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: owner.email, password: "not-used-in-production" });
+    expect((await alice.post("/api/v1/admin/content").send({})).status).toBe(
+      403,
+    );
+    expect(
+      (
+        await agent.post("/api/v1/admin/media").send({
+          base64: Buffer.from("<svg>not a photograph</svg>").toString("base64"),
+          alt: { en: "Test", hi: "परीक्षण", mr: "चाचणी" },
+          illustrative: true,
+          consent: true,
+        })
+      ).status,
+    ).toBe(400);
+    const draft = await agent.post("/api/v1/admin/content").send({
+      kind: "faq",
+      slug: "fictional-faq",
+      title: {
+        en: "Fictional question",
+        hi: "परीक्षण प्रश्न",
+        mr: "चाचणी प्रश्न",
+      },
+      body: {
+        en: "Fictional answer",
+        hi: "परीक्षण उत्तर",
+        mr: "चाचणी उत्तर",
+      },
+      published: false,
+      approved: false,
+      sortOrder: 0,
+    });
+    expect(draft.status).toBe(201);
+    expect(
+      (await request(app).get("/api/v1/public/content")).body.data,
+    ).toHaveLength(0);
+    const image = await agent.post("/api/v1/admin/media").send({
+      base64:
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jU0cAAAAASUVORK5CYII=",
+      alt: { en: "Fictional image", hi: "परीक्षण चित्र", mr: "चाचणी चित्र" },
+      illustrative: true,
+      consent: true,
+    });
+    expect(image.status).toBe(201);
+    expect(
+      (await request(app).get(`/api/v1/public/media/${image.body.data.id}`))
+        .headers["content-type"],
+    ).toContain("image/png");
+    const {
+      _id: contentId,
+      createdAt: _created,
+      updatedAt: _updated,
+      __v: _version,
+      ...editable
+    } = draft.body.data;
+    void _created;
+    void _updated;
+    void _version;
+    expect(
+      (
+        await agent.patch(`/api/v1/admin/content/${contentId}`).send({
+          ...editable,
+          published: true,
+          approved: true,
+          imageId: image.body.data.id,
+        })
+      ).status,
+    ).toBe(200);
+    const published = (await request(app).get("/api/v1/public/content")).body
+      .data;
+    expect(published[0].title.mr).toBe("चाचणी प्रश्न");
+    expect(published[0].imageId.data).toBeUndefined();
+    await Media.findByIdAndDelete(image.body.data.id);
+    await Content.findByIdAndDelete(draft.body.data._id);
+  });
+  it("creates unpublished services and prevents duplicate published service photos", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: owner.email, password: "not-used-in-production" });
+    const draft = await agent.post("/api/v1/admin/services").send({
+      slug: "physiotherapy",
+      name: "Fictional physiotherapy",
+      tag: "TEST",
+      summary: "Fictional service summary only",
+      description: "Fictional service details for isolated tests only",
+      includes: ["Fictional activity"],
+      excludes: ["Emergency treatment"],
+      clinical: true,
+      requiredQualification: "physiotherapist",
+      image: "physiotherapy",
+    });
+    expect(draft.status).toBe(201);
+    expect(draft.body.data.active).toBe(false);
+    expect(draft.body.data.requiredQualification).toBe("physiotherapist");
+    const edited = await agent
+      .patch(`/api/v1/admin/services/${draft.body.data._id}`)
+      .send({
+        image: "physiotherapy",
+        sortOrder: 3,
+        featured: true,
+        seoTitle: "Fictional service title",
+      });
+    expect(edited.status).toBe(200);
+    expect(edited.body.data.seoTitle).toBe("Fictional service title");
+    expect(
+      (await request(app).get("/api/v1/services/physiotherapy")).status,
+    ).toBe(404);
+    expect(
+      (
+        await agent
+          .patch(`/api/v1/admin/services/${draft.body.data._id}`)
+          .send({ active: true, image: "home-nursing" })
+      ).status,
+    ).toBe(400);
+    expect(
+      (
+        await agent
+          .patch(`/api/v1/admin/services/${draft.body.data._id}`)
+          .send({ active: true })
+      ).status,
+    ).toBe(200);
+    await Service.findByIdAndDelete(draft.body.data._id);
+  });
+  it("requires a closed enquiry and owner retention review before redaction", async () => {
+    const inquiry = await Inquiry.findOne({ name: "Fictional Enquiry" });
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: owner.email, password: "not-used-in-production" });
+    const input = {
+      reason: "Fictional verified retention request",
+      confirmed: true,
+    };
+    expect(
+      (
+        await agent
+          .post(`/api/v1/admin/inquiries/${inquiry._id}/redact`)
+          .send(input)
+      ).status,
+    ).toBe(409);
+    await agent
+      .patch(`/api/v1/admin/inquiries/${inquiry._id}`)
+      .send({ status: "closed" });
+    const redacted = await agent
+      .post(`/api/v1/admin/inquiries/${inquiry._id}/redact`)
+      .send(input);
+    expect(redacted.status).toBe(200);
+    expect(redacted.body.data.phone).toBe("redacted");
+    expect(redacted.body.data.notes).toHaveLength(0);
+    expect(
+      await Audit.exists({
+        action: "inquiry.redacted",
+        resource: String(inquiry._id),
+      }),
+    ).toBeTruthy();
+  });
   it("allows public browsing", async () => {
     expect((await request(app).get("/api/v1/services")).body.data).toHaveLength(
       6,

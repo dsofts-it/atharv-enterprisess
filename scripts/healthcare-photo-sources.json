@@ -1,0 +1,66 @@
+[
+  {
+    "slug": "hero",
+    "source": "output/imagegen/healthcare/hero.png"
+  },
+  {
+    "slug": "home-nursing",
+    "source": "output/imagegen/healthcare/home-nursing.png"
+  },
+  {
+    "slug": "elderly-care",
+    "source": "output/imagegen/healthcare/elderly-care.png"
+  },
+  {
+    "slug": "patient-attendant",
+    "source": "output/imagegen/healthcare/patient-attendant.png"
+  },
+  {
+    "slug": "post-operative-care",
+    "source": "output/imagegen/healthcare/post-operative-care.png"
+  },
+  {
+    "slug": "day-night-care",
+    "source": "output/imagegen/healthcare/day-night-care.png"
+  },
+  {
+    "slug": "bedridden-care",
+    "source": "output/imagegen/healthcare/bedridden-care.png"
+  },
+  {
+    "slug": "tracheostomy-care",
+    "source": "output/imagegen/healthcare/tracheostomy-care.png"
+  },
+  {
+    "slug": "neurological-care",
+    "source": "output/imagegen/healthcare/neurological-care.png"
+  },
+  {
+    "slug": "orthopedic-care",
+    "source": "output/imagegen/healthcare/orthopedic-care.png"
+  },
+  {
+    "slug": "baby-care",
+    "source": "output/imagegen/healthcare/baby-care.png"
+  },
+  {
+    "slug": "mother-newborn-care",
+    "source": "output/imagegen/healthcare/mother-newborn-care.png"
+  },
+  {
+    "slug": "physiotherapy",
+    "source": "output/imagegen/healthcare/physiotherapy.png"
+  },
+  {
+    "slug": "medical-equipment",
+    "source": "output/imagegen/healthcare/medical-equipment.png"
+  },
+  {
+    "slug": "palliative-care",
+    "source": "output/imagegen/healthcare/palliative-care.png"
+  },
+  {
+    "slug": "child-care",
+    "source": "output/imagegen/healthcare/child-care.png"
+  }
+]

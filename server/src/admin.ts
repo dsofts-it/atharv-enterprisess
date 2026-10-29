@@ -14,7 +14,9 @@ import {
   Service,
   Assignment,
   Agreement,
+  Media,
 } from "./models.js";
+import { serviceDrafts } from "../../shared/serviceDrafts.js";
 import { wrap, ok, assert, audit, notify, publicUser } from "./lib.js";
 import {
   assignCaregiver,
@@ -24,11 +26,111 @@ import {
   issueAgreement,
 } from "./workflows.js";
 import { email, password } from "../../shared/schemas.js";
+const serviceTranslations = z
+  .object({
+    hi: z
+      .object({
+        name: z.string().min(2).max(100),
+        summary: z.string().min(10).max(300),
+        description: z.string().min(20).max(2000),
+      })
+      .strict(),
+    mr: z
+      .object({
+        name: z.string().min(2).max(100),
+        summary: z.string().min(10).max(300),
+        description: z.string().min(20).max(2000),
+      })
+      .strict(),
+  })
+  .strict();
+async function validateServicePhoto(image: string) {
+  if (image.startsWith("media-")) {
+    assert(
+      /^[a-f\d]{24}$/i.test(image.slice(6)) &&
+        (await Media.exists({ _id: image.slice(6) })),
+      400,
+      "Choose an uploaded photograph",
+    );
+  } else {
+    assert(
+      [
+        "home-nursing",
+        "elderly-care",
+        "patient-attendant",
+        "post-operative-care",
+        "day-night-care",
+        "bedridden-care",
+        ...serviceDrafts.map((service) => service[0]),
+      ].includes(image),
+      400,
+      "Choose an available service photograph",
+    );
+  }
+}
 export const admin = Router();
 admin.use(authenticate);
 const ops = roles("owner", "operations");
 const finance = roles("owner", "accountant");
 const owner = roles("owner");
+admin.post(
+  "/inquiries/:id/redact",
+  owner,
+  wrap(async (req, res) => {
+    const { reason, confirmed } = z
+      .object({
+        reason: z.string().trim().min(10).max(300),
+        confirmed: z.literal(true),
+      })
+      .strict()
+      .parse(req.body);
+    assert(confirmed, 400, "Confirm the retention review");
+    const inquiry = await Inquiry.findOneAndUpdate(
+      { _id: req.params.id, status: { $in: ["closed", "cancelled"] } },
+      {
+        $set: {
+          name: "Redacted enquiry",
+          phone: "redacted",
+          locality: "redacted",
+          notes: [],
+          redactedAt: new Date(),
+        },
+        $unset: {
+          email: 1,
+          city: 1,
+          patientAge: 1,
+          startDate: 1,
+          preferredShift: 1,
+          requirements: 1,
+          assignedTo: 1,
+        },
+      },
+      { returnDocument: "after" },
+    );
+    assert(
+      inquiry,
+      409,
+      "Close or cancel the enquiry before removing personal details",
+    );
+    await audit(req.user._id, "inquiry.redacted", String(inquiry._id), {
+      reason,
+    });
+    ok(res, inquiry);
+  }),
+);
+admin.get(
+  "/inquiry-team",
+  ops,
+  wrap(async (_req, res) =>
+    ok(
+      res,
+      await User.find({
+        active: true,
+        role: { $in: ["owner", "operations", "coordinator"] },
+      }).select("name role"),
+    ),
+  ),
+);
 admin.get(
   "/dashboard",
   roles("owner", "operations", "accountant"),
@@ -73,26 +175,182 @@ admin.get(
 admin.get(
   "/inquiries",
   ops,
-  wrap(async (_req, res) =>
-    ok(res, await Inquiry.find().sort({ createdAt: -1 }).limit(100)),
-  ),
+  wrap(async (req, res) => {
+    const filter: any = {};
+    if (typeof req.query.status === "string" && req.query.status !== "all")
+      filter.status = req.query.status;
+    if (typeof req.query.search === "string" && req.query.search.trim()) {
+      const search = req.query.search
+        .trim()
+        .slice(0, 100)
+        .replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      filter.$or = [
+        "name",
+        "phone",
+        "email",
+        "reference",
+        "service",
+        "locality",
+      ].map((field) => ({ [field]: { $regex: search, $options: "i" } }));
+    }
+    await audit(req.user._id, "inquiries.viewed", "inquiries");
+    ok(res, await Inquiry.find(filter).sort({ createdAt: -1 }).limit(100));
+  }),
 );
 admin.patch(
   "/inquiries/:id",
   ops,
   wrap(async (req, res) => {
     const d = z
-      .object({ status: z.enum(["reviewed", "closed"]) })
+      .object({
+        status: z
+          .enum([
+            "new",
+            "reviewed",
+            "contacted",
+            "follow-up",
+            "confirmed",
+            "closed",
+            "cancelled",
+          ])
+          .optional(),
+        assignedTo: z
+          .string()
+          .regex(/^[a-f\d]{24}$/i)
+          .nullable()
+          .optional(),
+        note: z.string().trim().min(1).max(1000).optional(),
+      })
       .strict()
       .parse(req.body);
-    const i = await Inquiry.findByIdAndUpdate(
-      req.params.id,
-      { $set: d },
-      { returnDocument: "after" },
-    );
+    if (d.assignedTo)
+      assert(
+        await User.exists({
+          _id: d.assignedTo,
+          active: true,
+          role: { $in: ["owner", "operations", "coordinator"] },
+        }),
+        400,
+        "Choose an active care team member",
+      );
+    const { note, ...fields } = d;
+    const update: any = { $set: fields };
+    if (note)
+      update.$push = {
+        notes: { text: note, authorId: req.user._id, createdAt: new Date() },
+      };
+    const i = await Inquiry.findByIdAndUpdate(req.params.id, update, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     assert(i, 404, "Inquiry not found");
     await audit(req.user._id, "inquiry.updated", String(i._id));
     ok(res, i);
+  }),
+);
+admin.get(
+  "/inquiry-analytics",
+  ops,
+  wrap(async (_req, res) => {
+    const [total, statuses, popular, monthly] = await Promise.all([
+      Inquiry.countDocuments(),
+      Inquiry.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]),
+      Inquiry.aggregate([
+        { $group: { _id: "$service", count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 6 },
+      ]),
+      Inquiry.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: new Date(Date.now() - 365 * 86400000) },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $dateToString: {
+                format: "%Y-%m",
+                date: "$createdAt",
+                timezone: "Asia/Kolkata",
+              },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+    ]);
+    ok(res, { total, statuses, popular, monthly });
+  }),
+);
+admin.get(
+  "/inquiries-export",
+  ops,
+  wrap(async (req, res) => {
+    const rows = await Inquiry.find()
+      .sort({ createdAt: -1 })
+      .limit(1000)
+      .select("reference name service locality status createdAt");
+    const cell = (value: unknown) => {
+      const raw = String(value ?? "");
+      const safe = /^\s*[=+@-]|^[\t\r]/.test(raw) ? `'${raw}` : raw;
+      return `"${safe.replaceAll('"', '""')}"`;
+    };
+    const csv = [
+      ["Reference", "Name", "Service", "Locality", "Status", "Created"],
+      ...rows.map((row: any) => [
+        row.reference || row._id,
+        row.name,
+        row.service,
+        row.locality,
+        row.status,
+        row.createdAt?.toISOString(),
+      ]),
+    ]
+      .map((row) => row.map(cell).join(","))
+      .join("\r\n");
+    await audit(req.user._id, "inquiries.exported", "inquiries");
+    res.setHeader("Cache-Control", "no-store");
+    res.type("text/csv").attachment("atharv-enquiries.csv").send(csv);
+  }),
+);
+admin.get(
+  "/services",
+  owner,
+  wrap(async (_req, res) =>
+    ok(res, await Service.find().sort({ sortOrder: 1 })),
+  ),
+);
+const serviceInput = z.object({
+  requiredQualification: z.enum(["nurse", "physiotherapist"]).optional(),
+  slug: z
+    .string()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .max(80),
+  name: z.string().trim().min(2).max(100),
+  tag: z.string().max(80),
+  summary: z.string().trim().min(10).max(300),
+  description: z.string().trim().min(20).max(2000),
+  includes: z.array(z.string().max(200)).max(12),
+  excludes: z.array(z.string().max(200)).max(12),
+  clinical: z.boolean(),
+  image: z
+    .string()
+    .regex(/^[a-z0-9-]+$/)
+    .optional(),
+  translations: serviceTranslations.optional(),
+});
+admin.post(
+  "/services",
+  owner,
+  wrap(async (req, res) => {
+    const data = serviceInput.strict().parse(req.body);
+    if (data.requiredQualification) data.clinical = true;
+    if (data.image) await validateServicePhoto(data.image);
+    const service = await Service.create({ ...data, active: false });
+    await audit(req.user._id, "service.created", String(service._id));
+    ok(res, service, 201);
   }),
 );
 admin.get(
@@ -173,7 +431,7 @@ const caregiverInput = z
   .object({
     userId: z.string().regex(/^[a-f\d]{24}$/i),
     displayName: z.string().min(2).max(100),
-    qualification: z.enum(["nurse", "attendant"]),
+    qualification: z.enum(["nurse", "attendant", "physiotherapist"]),
     services: z.array(z.string().max(80)).min(1),
     localities: z.array(z.string().max(100)).min(1),
     languages: z.array(z.string().max(30)),
@@ -214,7 +472,7 @@ admin.patch(
     assert(c, 404, "Caregiver not found");
     if (d.status === "approved") {
       assert(
-        c.qualification !== "nurse" ||
+        !["nurse", "physiotherapist"].includes(c.qualification) ||
           new Date(d.credentialExpiry || c.credentialExpiry) > new Date(),
         409,
         "Valid credential expiry is required",
@@ -410,7 +668,19 @@ admin.patch(
         name: z.string().min(2).max(100).optional(),
         summary: z.string().min(10).max(300).optional(),
         description: z.string().min(20).max(2000).optional(),
+        includes: z.array(z.string().min(1).max(200)).max(12).optional(),
+        excludes: z.array(z.string().min(1).max(200)).max(12).optional(),
         active: z.boolean().optional(),
+        sortOrder: z.number().int().min(0).max(1000).optional(),
+        featured: z.boolean().optional(),
+        image: z
+          .string()
+          .regex(/^[a-z0-9-]+$/)
+          .optional(),
+        seoTitle: z.string().max(100).optional(),
+        seoDescription: z.string().max(300).optional(),
+        translations: serviceTranslations.optional(),
+
         ratePaise: z.number().int().positive().optional(),
         rateUnit: z
           .enum(["visit", "hour", "shift", "day", "week", "month"])
@@ -418,6 +688,24 @@ admin.patch(
       })
       .strict()
       .parse(req.body);
+    const current = await Service.findById(req.params.id);
+    assert(current, 404, "Service not found");
+    if (d.image) await validateServicePhoto(d.image);
+    if (d.active ?? current.active) {
+      const imageKey = (row: any) =>
+        row.image ||
+        (row.slug === "24-hour-care" ? "day-night-care" : row.slug);
+      const nextImage = d.image || imageKey(current);
+      const otherServices = await Service.find({
+        active: true,
+        _id: { $ne: current._id },
+      }).select("slug image");
+      assert(
+        !otherServices.some((row: any) => imageKey(row) === nextImage),
+        400,
+        "Choose a unique photograph for this service",
+      );
+    }
     const s = await Service.findByIdAndUpdate(
       req.params.id,
       { $set: d },

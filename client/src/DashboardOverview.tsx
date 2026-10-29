@@ -1,3 +1,4 @@
+import { tr } from "./legacyTranslations";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -177,21 +178,23 @@ export default function DashboardOverview({
               ? "THOUGHTFUL CARE, WORKING TOGETHER"
               : worker
                 ? "A NEW DAY TO MAKE A DIFFERENCE"
-                : "YOUR CARE JOURNEY, CONNECTED"}
+                : tr("YOUR CARE JOURNEY, CONNECTED")}
           </span>
           <h2>
             {ops
               ? "A clearer picture. A more connected team."
               : worker
                 ? "You bring the human touch."
-                : "Good care feels even better together."}
+                : tr("Good care feels even better together.")}
           </h2>
           <p>
             {ops
               ? "Keep the next step moving, from the first conversation to coordinated care."
               : worker
                 ? "Your assigned work, important updates and next shift, all close at hand."
-                : "We’re here to help you find your footing. Your care details and next steps are right here."}
+                : tr(
+                    "We’re here to help you find your footing. Your care details and next steps are right here.",
+                  )}
           </p>
           <button
             className="text-link"
@@ -203,7 +206,7 @@ export default function DashboardOverview({
               ? "Review care requests"
               : worker
                 ? "See your schedule"
-                : "Talk to your care team"}
+                : tr("Talk to your care team")}
             <ArrowUpRight size={16} />
           </button>
         </div>
@@ -218,7 +221,7 @@ export default function DashboardOverview({
           {metrics.map(([label, value, Icon, tab], i) => {
             const I = Icon as typeof CalendarDays;
             return (
-              <Reveal key={String(label)} delay={i * 0.05}>
+              <Reveal key={tr(String(label))} delay={i * 0.05}>
                 <button
                   className="overview-metric"
                   onClick={() => onNavigate(String(tab))}
@@ -252,20 +255,21 @@ export default function DashboardOverview({
             <Reveal className="dashboard-panel">
               <div className="panel-heading">
                 <div>
-                  <p className="eyebrow">ONE STEP AT A TIME</p>
+                  <p className="eyebrow">{tr("ONE STEP AT A TIME")}</p>
                   <h3>
                     {ops
                       ? "Upcoming coordinated care"
                       : worker
                         ? "Your next shift"
-                        : "Your next care visit"}
+                        : tr("Your next care visit")}
                   </h3>
                 </div>
                 <button
                   className="text-button"
                   onClick={() => onNavigate("Schedule")}
                 >
-                  View schedule <ArrowUpRight size={14} />
+                  {tr("View schedule")}
+                  <ArrowUpRight size={14} />
                 </button>
               </div>
               {shifts.error ? (
@@ -293,7 +297,8 @@ export default function DashboardOverview({
                     <p>
                       {date(next.start)}
                       <br />
-                      Until {date(next.end)}
+                      {tr("Until")}
+                      {date(next.end)}
                     </p>
                     {assigned?.instructions && (
                       <p className="notice">{assigned.instructions}</p>
@@ -323,18 +328,20 @@ export default function DashboardOverview({
                   title={
                     worker
                       ? "Your next shift is on its way."
-                      : "Your next visit starts with a conversation."
+                      : tr("Your next visit starts with a conversation.")
                   }
                   text={
                     worker
                       ? "When the team assigns your work, your schedule and approved instructions will appear here."
-                      : "Confirmed caregiver shifts will appear here once the team has coordinated your care."
+                      : tr(
+                          "Confirmed caregiver shifts will appear here once the team has coordinated your care.",
+                        )
                   }
                   action={
                     client
-                      ? "Explore care services"
+                      ? tr("Explore care services")
                       : ops
-                        ? "Review requests"
+                        ? tr("Review requests")
                         : undefined
                   }
                   to={client ? "/services" : undefined}
@@ -347,18 +354,19 @@ export default function DashboardOverview({
             <Reveal className="dashboard-panel">
               <div className="panel-heading">
                 <div>
-                  <p className="eyebrow">YOUR CARE, STEP BY STEP</p>
+                  <p className="eyebrow">{tr("YOUR CARE, STEP BY STEP")}</p>
                   <h3>
                     {ops
                       ? "Requests that need a next step"
-                      : "Your care requests"}
+                      : tr("Your care requests")}
                   </h3>
                 </div>
                 <button
                   className="text-button"
                   onClick={() => onNavigate("Bookings")}
                 >
-                  View all <ArrowUpRight size={14} />
+                  {tr("View all")}
+                  <ArrowUpRight size={14} />
                 </button>
               </div>
               {bookings.isLoading ? (
@@ -382,7 +390,8 @@ export default function DashboardOverview({
                     <BookingTimeline status={b.status} />
                     {b.quotePaise && (
                       <p className="quote-preview">
-                        Proposed quote: <b>{money(b.quotePaise)}</b>
+                        {tr("Proposed quote:")}
+                        <b>{money(b.quotePaise)}</b>
                       </p>
                     )}
                     <button
@@ -396,8 +405,8 @@ export default function DashboardOverview({
                       }
                     >
                       {b.status === "agreement" && client
-                        ? "Review your agreement"
-                        : "View request"}
+                        ? tr("Review your agreement")
+                        : tr("View request")}
                       <ArrowUpRight size={14} />
                     </button>
                   </article>
@@ -405,9 +414,13 @@ export default function DashboardOverview({
               ) : (
                 <EmptyState
                   type="empty-booking"
-                  title="Let’s take your first step, together."
-                  text="Tell us a little about your family’s needs. We’ll help you find a thoughtful place to begin."
-                  action={client ? "Start a care request" : "Review bookings"}
+                  title={tr("Let’s take your first step, together.")}
+                  text={tr(
+                    "Tell us a little about your family’s needs. We’ll help you find a thoughtful place to begin.",
+                  )}
+                  action={
+                    client ? tr("Start a care request") : "Review bookings"
+                  }
                   to={client ? "/request-care" : undefined}
                   onAction={!client ? () => onNavigate("Bookings") : undefined}
                 />
@@ -561,7 +574,7 @@ export default function DashboardOverview({
             />
           )}
           <Reveal className="dashboard-panel quick-actions">
-            <h3>A little help, right here.</h3>
+            <h3>{tr("A little help, right here.")}</h3>
             {(user.role === "accountant"
               ? [
                   ["Review invoices", Receipt, "Billing"],
@@ -621,7 +634,9 @@ export default function DashboardOverview({
                 <Receipt size={20} />
               </span>
               <h3>
-                {client ? "Your billing, at a glance." : "Outstanding invoices"}
+                {client
+                  ? tr("Your billing, at a glance.")
+                  : tr("Outstanding invoices")}
               </h3>
               {invoices.error ? (
                 <ErrorState error={invoices.error} />
@@ -629,29 +644,32 @@ export default function DashboardOverview({
                 <>
                   <strong>{money(outstanding)}</strong>
                   <p>
-                    Outstanding across{" "}
+                    {tr("Outstanding across")}{" "}
                     {bills.filter((i) => i.status !== "paid").length}{" "}
-                    invoice(s).
+                    {tr("invoice(s).")}
                   </p>
                   <button
                     className="text-link"
                     onClick={() => onNavigate("Billing")}
                   >
-                    Review invoices <ArrowUpRight size={15} />
+                    {tr("Review invoices")}
+                    <ArrowUpRight size={15} />
                   </button>
                 </>
               ) : (
                 <EmptyState
                   type="invoice"
-                  title="All clear for now."
-                  text="Your issued invoices and receipts will appear here."
+                  title={tr("All clear for now.")}
+                  text={tr(
+                    "Your issued invoices and receipts will appear here.",
+                  )}
                 />
               )}
             </Reveal>
           )}
           <Reveal className="dashboard-panel updates-panel">
             <div className="panel-heading">
-              <h3>Care updates</h3>
+              <h3>{tr("Care updates")}</h3>
               <Bell size={18} />
             </div>
             {notifications.error ? (
@@ -669,15 +687,16 @@ export default function DashboardOverview({
             ) : (
               <EmptyState
                 type="notification"
-                title="A little quiet is a good thing."
-                text="Important care updates will be collected here."
+                title={tr("A little quiet is a good thing.")}
+                text={tr("Important care updates will be collected here.")}
               />
             )}
             <button
               className="text-link"
               onClick={() => onNavigate("Notifications")}
             >
-              All notifications <ArrowUpRight size={15} />
+              {tr("All notifications")}
+              <ArrowUpRight size={15} />
             </button>
           </Reveal>
         </aside>
@@ -707,7 +726,7 @@ function BookingTimeline({ status }: { status: string }) {
           <span>
             {index > Number(position) ? <CheckCircle2 size={12} /> : null}
           </span>
-          <small>{label}</small>
+          <small>{tr(String(label))}</small>
         </li>
       ))}
     </ol>
@@ -734,7 +753,7 @@ function CalendarPanel({
   return (
     <Reveal className="dashboard-panel care-calendar">
       <div className="panel-heading">
-        <h3>Your care calendar</h3>
+        <h3>{tr("Your care calendar")}</h3>
         <CalendarDays size={18} />
       </div>
       <div className="calendar-month">
@@ -796,11 +815,12 @@ function CalendarPanel({
         <p>
           {relevant.length
             ? `${relevant.length} shift(s) on this date`
-            : "No care shifts on this date."}
+            : tr("No care shifts on this date.")}
         </p>
       </div>
       <button className="text-link" onClick={onNavigate}>
-        Open full schedule <ArrowUpRight size={15} />
+        {tr("Open full schedule")}
+        <ArrowUpRight size={15} />
       </button>
     </Reveal>
   );

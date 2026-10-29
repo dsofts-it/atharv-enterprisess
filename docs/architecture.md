@@ -35,3 +35,11 @@ Assignment creation increments the caregiver’s user schedule version inside a 
 Inquiry → assessment → quote → agreement → confirmed → active → completed/cancelled. Confirmation requires current client acknowledgment and approved billing. Assignment requires current client and caregiver agreements. Document text and acceptance are retained; no API allows clients to overwrite them. Ordinary acceptance is not described as a qualified digital signature.
 
 Requests for changes and transfers create reviewable tickets. They do not automatically impose penalties, transfer employment or change billing. No surveillance is performed. Software cannot prevent off-platform relationships.
+
+## Healthcare upgrade (29 October 2026)
+
+The public site now has a dedicated healthcare design and English/Hindi/Marathi copy, with local language persistence. `HealthcareLayout` provides shared navigation/footer/quick contact, while the public healthcare routes load separately. Existing private workflows remain in Pages/Portal and retain the same API contracts.
+
+New collections: `contents` stores approved multilingual public content, `media` stores bounded public marketing images, and `businesssettings` stores verified public contact details. Services now support images, order, featured state, localized copy and SEO. New services begin as inactive drafts. Enquiries support UUID retries, public references, expanded preferences, statuses, staff assignment, internal follow-up notes and reviewed redaction. Notifications remain generic and patient-detail-free.
+
+Marketing images are public and are not a private patient-document feature. Legacy records remain compatible; optional new fields do not require deleting or reseeding data. The shared service-draft list adds owner editing templates, not automatic public claims of service availability. See healthcare-upgrade-audit.md for full scope and limitations.

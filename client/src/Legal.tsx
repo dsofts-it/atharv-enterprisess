@@ -1,3 +1,5 @@
+import { useLanguage } from "./i18n";
+import { legalTranslations } from "./legalTranslations";
 import { useParams, Link } from "react-router-dom";
 import { PageIntro } from "./components";
 const content: Record<string, { title: string; sections: [string, string][] }> =
@@ -155,16 +157,31 @@ const content: Record<string, { title: string; sections: [string, string][] }> =
     },
   };
 export default function Legal({ page }: { page?: string }) {
+  const { language, t } = useLanguage();
   const params = useParams();
   const key = page || params.page || "";
-  const data = content[key];
+  const data =
+    language === "en"
+      ? content[key]
+      : legalTranslations[key]?.[language] || content[key];
   if (!data) return null;
   return (
     <>
-      <PageIntro eyebrow="INFORMATION & RESPONSIBILITIES" title={data.title} />
+      <PageIntro
+        eyebrow={t([
+          "INFORMATION & RESPONSIBILITIES",
+          "जानकारी और जिम्मेदारियाँ",
+          "माहिती आणि जबाबदाऱ्या",
+        ])}
+        title={data.title}
+      />
       <article className="container narrow legal">
         <div className="notice">
-          Draft for business and Indian legal review before production use.
+          {t([
+            "Draft for business and Indian legal review before production use.",
+            "वास्तविक उपयोग से पहले व्यवसाय और भारतीय कानूनी समीक्षा के लिए मसौदा।",
+            "प्रत्यक्ष वापरापूर्वी व्यवसाय आणि भारतीय कायदेशीर पुनरावलोकनासाठी मसुदा.",
+          ])}
         </div>
         {data.sections.map(([title, text]) => (
           <section key={title}>
@@ -173,7 +190,11 @@ export default function Legal({ page }: { page?: string }) {
           </section>
         ))}
         <Link className="text-link" to="/contact">
-          Contact the care team
+          {t([
+            "Contact the care team",
+            "देखभाल टीम से संपर्क करें",
+            "देखभाल संघाशी संपर्क करा",
+          ])}
         </Link>
       </article>
     </>

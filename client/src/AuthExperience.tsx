@@ -1,3 +1,5 @@
+import { LanguageSwitcher } from "./i18n";
+import { tr } from "./legacyTranslations";
 import { useId, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
@@ -68,8 +70,8 @@ export default function AuthExperience({
     } catch (e) {
       setError(
         e instanceof z.ZodError
-          ? e.issues.map((i) => i.message).join(". ")
-          : (e as Error).message,
+          ? tr("Please check your email and password.")
+          : tr((e as Error).message),
       );
     } finally {
       setBusy(false);
@@ -77,27 +79,31 @@ export default function AuthExperience({
   }
   return (
     <div className={`portal-entry ${standalone ? "standalone" : ""}`}>
+      {standalone && <LanguageSwitcher />}
       {standalone && (
         <div className="portal-entry-nav">
           <Logo />
           <Link to="/">
-            <ArrowLeft size={15} /> Back to website
+            <ArrowLeft size={15} />
+            {tr("Back to website")}
           </Link>
         </div>
       )}
       <div className="portal-entry-layout container">
         <Reveal className="portal-welcome">
           <p className="eyebrow">
-            <span className="pulse-dot" /> YOUR CARE. YOUR PEOPLE. ONE PLACE.
+            <span className="pulse-dot" />
+            {tr("YOUR CARE. YOUR PEOPLE. ONE PLACE.")}
           </p>
           <h1>
-            A little less worry.
+            {tr("A little less worry.")}
             <br />
-            <em>A lot more connection.</em>
+            <em>{tr("A lot more connection.")}</em>
           </h1>
           <p>
-            Welcome to your Atharv care portal. A thoughtful space to keep your
-            care journey organized, and your next step clear.
+            {tr(
+              "Welcome to your Atharv care portal. A thoughtful space to keep your care journey organized, and your next step clear.",
+            )}
           </p>
           <div className="portal-welcome-art">
             <img
@@ -108,7 +114,8 @@ export default function AuthExperience({
               height="280"
             />
             <span className="portal-art-note">
-              <HeartHandshake size={21} /> You’re part of the care team, too.
+              <HeartHandshake size={21} />
+              {tr("You’re part of the care team, too.")}
             </span>
           </div>
           <div className="entry-journey">
@@ -119,7 +126,7 @@ export default function AuthExperience({
             ].map(([Icon, text], i) => {
               const I = Icon as typeof CalendarDays;
               return (
-                <div key={String(text)}>
+                <div key={tr(String(text))}>
                   <span>
                     <I size={18} />
                   </span>
@@ -136,9 +143,10 @@ export default function AuthExperience({
               <HeartHandshake size={27} />
             </span>
             <div className="signin-topline">
-              <p className="eyebrow">ATHARV CARE PORTAL</p>
+              <p className="eyebrow">{tr("ATHARV CARE PORTAL")}</p>
               <span>
-                <LockKeyhole size={12} /> Private by design
+                <LockKeyhole size={12} />
+                {tr("Private by design")}
               </span>
             </div>
             <AnimatePresence mode="wait" initial={false}>
@@ -151,17 +159,21 @@ export default function AuthExperience({
               >
                 <h2>
                   {mode === "register"
-                    ? "Let’s get you connected."
+                    ? tr("Let’s get you connected.")
                     : mode === "forgot"
-                      ? "Let’s help you back in."
-                      : "It’s good to see you."}
+                      ? tr("Let’s help you back in.")
+                      : tr("It’s good to see you.")}
                 </h2>
                 <p>
                   {mode === "register"
-                    ? "Create an account to request and manage care securely."
+                    ? tr(
+                        "Create an account to request and manage care securely.",
+                      )
                     : mode === "forgot"
-                      ? "Enter your account email to request a recovery link."
-                      : "Sign in to pick up your care journey."}
+                      ? tr(
+                          "Enter your account email to request a recovery link.",
+                        )
+                      : tr("Sign in to pick up your care journey.")}
                 </p>
                 {sessionIssue && <p className="notice">{sessionIssue}</p>}
                 {recoverySent ? (
@@ -169,24 +181,25 @@ export default function AuthExperience({
                     <span>
                       <Check size={25} />
                     </span>
-                    <h3>Check your inbox.</h3>
+                    <h3>{tr("Check your inbox.")}</h3>
                     <p>
-                      If an account exists and email delivery is configured,
-                      recovery instructions will be sent. Don’t see an email?
-                      Contact the care team for help.
+                      {tr(
+                        "If an account exists and email delivery is configured, recovery instructions will be sent. Don’t see an email? Contact the care team for help.",
+                      )}
                     </p>
                     <button
                       className="button full"
                       onClick={() => change("login")}
                     >
-                      Back to sign in <ArrowUpRight size={17} />
+                      {tr("Back to sign in")}
+                      <ArrowUpRight size={17} />
                     </button>
                   </div>
                 ) : (
                   <form onSubmit={submit} aria-busy={busy}>
                     {mode === "register" && (
                       <div className="field">
-                        <label htmlFor={`${id}-name`}>Your name</label>
+                        <label htmlFor={`${id}-name`}>{tr("Your name")}</label>
                         <input
                           id={`${id}-name`}
                           name="name"
@@ -194,12 +207,14 @@ export default function AuthExperience({
                           minLength={2}
                           maxLength={100}
                           autoComplete="name"
-                          placeholder="How should we address you?"
+                          placeholder={tr("How should we address you?")}
                         />
                       </div>
                     )}
                     <div className="field">
-                      <label htmlFor={`${id}-email`}>Email address</label>
+                      <label htmlFor={`${id}-email`}>
+                        {tr("Email address")}
+                      </label>
                       <div className="input-with-icon">
                         <Mail size={17} />
                         <input
@@ -217,13 +232,15 @@ export default function AuthExperience({
                     {mode !== "forgot" && (
                       <div className="field">
                         <div className="password-label">
-                          <label htmlFor={`${id}-password`}>Password</label>
+                          <label htmlFor={`${id}-password`}>
+                            {tr("Password")}
+                          </label>
                           {mode === "login" && (
                             <button
                               type="button"
                               onClick={() => change("forgot")}
                             >
-                              Forgot password?
+                              {tr("Forgot password?")}
                             </button>
                           )}
                         </div>
@@ -243,14 +260,16 @@ export default function AuthExperience({
                             required
                             placeholder={
                               mode === "register"
-                                ? "At least 12 characters"
-                                : "Enter your password"
+                                ? tr("At least 12 characters")
+                                : tr("Enter your password")
                             }
                           />
                           <button
                             type="button"
                             aria-label={
-                              visible ? "Hide password" : "Show password"
+                              visible
+                                ? tr("Hide password")
+                                : tr("Show password")
                             }
                             aria-controls={`${id}-password`}
                             onClick={() => setVisible(!visible)}
@@ -260,7 +279,9 @@ export default function AuthExperience({
                         </div>
                         {mode === "register" && (
                           <small>
-                            Use a unique password with at least 12 characters.
+                            {tr(
+                              "Use a unique password with at least 12 characters.",
+                            )}
                           </small>
                         )}
                       </div>
@@ -280,12 +301,12 @@ export default function AuthExperience({
                       disabled={busy}
                     >
                       {busy
-                        ? "Please wait…"
+                        ? tr("Please wait…")
                         : mode === "register"
-                          ? "Create account"
+                          ? tr("Create account")
                           : mode === "forgot"
-                            ? "Send recovery instructions"
-                            : "Sign in"}
+                            ? tr("Send recovery instructions")
+                            : tr("Sign in")}
                       <ArrowUpRight size={18} />
                     </button>
                   </form>
@@ -293,18 +314,20 @@ export default function AuthExperience({
                 <div className="signin-register">
                   {mode === "register" ? (
                     <>
-                      Already part of the family?{" "}
-                      <button onClick={() => change("login")}>Sign in</button>
+                      {tr("Already part of the family?")}{" "}
+                      <button onClick={() => change("login")}>
+                        {tr("Sign in")}
+                      </button>
                     </>
                   ) : mode === "forgot" ? (
                     <button onClick={() => change("login")}>
-                      Back to sign in
+                      {tr("Back to sign in")}
                     </button>
                   ) : (
                     <>
-                      New to Atharv?{" "}
+                      {tr("New to Atharv?")}{" "}
                       <button onClick={() => change("register")}>
-                        Create an account
+                        {tr("Create an account")}
                       </button>
                     </>
                   )}
@@ -314,19 +337,22 @@ export default function AuthExperience({
             <div className="signin-security">
               <ShieldCheck size={18} />
               <p>
-                Your personal care details stay behind your sign-in. We only
-                show information you’re authorized to access.
+                {tr(
+                  "Your personal care details stay behind your sign-in. We only show information you’re authorized to access.",
+                )}
               </p>
             </div>
           </div>
           <div className="entry-help">
             <Illustration name="contact" />
             <p>
-              Just exploring your options?
+              {tr("Just exploring your options?")}
               <br />
-              <Link to="/services">Browse care services</Link> or{" "}
+              <Link to="/services">{tr("Browse care services")}</Link>
+              {tr("or")}{" "}
               <Link to="/contact">
-                talk to our team <ArrowUpRight size={13} />
+                {tr("talk to our team")}
+                <ArrowUpRight size={13} />
               </Link>
             </p>
           </div>
@@ -336,9 +362,9 @@ export default function AuthExperience({
         <div className="portal-entry-bottom">
           <span>© {new Date().getFullYear()} Atharv Enterprises</span>
           <div>
-            <Link to="/privacy-policy">Privacy policy</Link>
-            <Link to="/accessibility">Accessibility</Link>
-            <Link to="/contact">Need a hand?</Link>
+            <Link to="/privacy-policy">{tr("Privacy policy")}</Link>
+            <Link to="/accessibility">{tr("Accessibility")}</Link>
+            <Link to="/contact">{tr("Need a hand?")}</Link>
           </div>
         </div>
       )}

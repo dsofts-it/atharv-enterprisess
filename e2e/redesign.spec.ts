@@ -95,12 +95,15 @@ test("navigation dropdown supports keyboard use and FAQ search filters content",
   await page.getByRole("button", { name: "Toggle services menu" }).click();
   await expect(page.locator("#service-dropdown")).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.locator("#service-dropdown")).toHaveCount(0);
+  await expect(page.locator("#service-dropdown")).not.toBeVisible();
   await page.getByLabel("Search care questions").fill("cancel");
-  await page.getByRole("button", { name: "What if I need to cancel?" }).click();
-  await expect(
-    page.getByRole("region", { name: "What if I need to cancel?" }),
-  ).toContainText("Cancellation request");
+  await page
+    .locator("summary")
+    .filter({ hasText: "How do I cancel or request a replacement?" })
+    .click();
+  await expect(page.locator(".hc-faq details[open]")).toContainText(
+    "Support in your care portal",
+  );
   await page.getByLabel("Search care questions").fill("no-such-question-xyz");
   await expect(
     page.getByText("No matching questions.", { exact: false }),
@@ -195,7 +198,9 @@ test("owner dashboard shows live chart data and the quote form is an accessible 
   await expect(dialog.getByLabel("Quote amount (INR)")).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).toHaveCount(0);
-  await expect(booking.getByRole('button',{name:'Prepare quote'})).toBeFocused();
+  await expect(
+    booking.getByRole("button", { name: "Prepare quote" }),
+  ).toBeFocused();
   await page
     .getByRole("navigation", { name: "Care portal" })
     .getByRole("button", { name: "Overview", exact: true })

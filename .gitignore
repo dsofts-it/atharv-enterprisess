@@ -10,3 +10,4 @@ playwright-report/
 .runtime-recovered/
 *.log
 .cache/
+output/

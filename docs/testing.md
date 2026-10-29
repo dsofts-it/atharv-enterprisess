@@ -1,3 +1,5 @@
+The latest healthcare upgrade verification is recorded in [healthcare testing](healthcare-testing.md): 31 unit/integration tests, 21 browser tests, production build and dependency audit. Older records below describe earlier versions.
+
 # Verification record
 
 ## Light healthcare theme and readability

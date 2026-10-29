@@ -6,6 +6,22 @@ afterEach(() => {
   vi.resetModules();
 });
 describe("separate frontend and API hosting", () => {
+  it("shows a useful unavailable message for a non-JSON hosting error", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        status: 503,
+        ok: false,
+        json: async () => {
+          throw new SyntaxError("HTML response");
+        },
+      }),
+    );
+    const { api } = await import("../src/api");
+    await expect(api("/services")).rejects.toThrow(
+      "The care service is unavailable. Please try again shortly.",
+    );
+  });
   it("keeps local API requests relative", async () => {
     vi.stubEnv("VITE_API_ORIGIN", "");
     const { apiUrl } = await import("../src/api");

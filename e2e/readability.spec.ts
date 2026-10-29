@@ -12,7 +12,14 @@ test("care information stays readable with sufficient contrast across screen siz
       await page.evaluate(() => document.fonts.ready);
       const findings = await page.evaluate(() => {
         const selectors = [
-          ".hero-description",
+          ".hc-lead",
+          ".hc-card-body > p",
+          ".hc-actions .button",
+          ".hc-hero h1",
+          ".hc-faq summary",
+          ".hc-faq details p",
+          ".hc-footer p",
+          ".hc-footer h3",
           ".service-body > p",
           ".hero-buttons .button",
           ".faq-item h3 > button",

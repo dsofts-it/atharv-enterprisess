@@ -54,7 +54,17 @@ export const Service = model("Service", {
   includes: [String],
   excludes: [String],
   clinical: Boolean,
+  requiredQualification: { type: String, enum: ["nurse", "physiotherapist"] },
   icon: String,
+  image: String,
+  sortOrder: { type: Number, default: 0 },
+  featured: { type: Boolean, default: false },
+  seoTitle: String,
+  seoDescription: String,
+  translations: {
+    hi: { name: String, summary: String, description: String },
+    mr: { name: String, summary: String, description: String },
+  },
   active: { type: Boolean, default: true },
   ratePaise: { type: Number, min: 0 },
   rateUnit: {
@@ -64,12 +74,36 @@ export const Service = model("Service", {
 });
 export const Inquiry = model("Inquiry", {
   name: str,
-  email: str,
+  email: String,
   phone: str,
   service: str,
   locality: str,
   consent: { type: Boolean, required: true },
-  status: { type: String, enum: ["new", "reviewed", "closed"], default: "new" },
+  reference: { type: String, unique: true, sparse: true },
+  requestId: { type: String, unique: true, sparse: true },
+  city: String,
+  patientAge: Number,
+  startDate: String,
+  careDuration: String,
+  preferredShift: String,
+  requirements: String,
+  language: String,
+  redactedAt: Date,
+  assignedTo: { type: Schema.Types.ObjectId, ref: "User" },
+  notes: [{ text: String, authorId: Schema.Types.ObjectId, createdAt: Date }],
+  status: {
+    type: String,
+    enum: [
+      "new",
+      "reviewed",
+      "contacted",
+      "follow-up",
+      "confirmed",
+      "closed",
+      "cancelled",
+    ],
+    default: "new",
+  },
 });
 export const Booking = model(
   "Booking",
@@ -110,7 +144,11 @@ export const Booking = model(
 export const Caregiver = model("Caregiver", {
   userId: { ...ref, unique: true },
   displayName: str,
-  qualification: { type: String, enum: ["nurse", "attendant"], required: true },
+  qualification: {
+    type: String,
+    enum: ["nurse", "attendant", "physiotherapist"],
+    required: true,
+  },
   services: [String],
   localities: [String],
   languages: [String],
@@ -259,7 +297,49 @@ export const Audit = model(
   },
   [{ createdAt: -1 }],
 );
+export const Content = model("Content", {
+  kind: {
+    type: String,
+    enum: [
+      "banner",
+      "about",
+      "faq",
+      "testimonial",
+      "gallery",
+      "video",
+      "blog",
+      "contact",
+    ],
+    required: true,
+  },
+  slug: { ...str, unique: true },
+  title: { en: str, hi: str, mr: str },
+  body: { en: String, hi: String, mr: String },
+  imageId: { type: Schema.Types.ObjectId, ref: "Media" },
+  externalUrl: String,
+  approved: { type: Boolean, default: false },
+  published: { type: Boolean, default: false },
+  sortOrder: { type: Number, default: 0 },
+});
+export const Media = model("Media", {
+  data: { type: Buffer, required: true },
+  contentType: str,
+  alt: { en: str, hi: str, mr: str },
+  illustrative: { type: Boolean, default: false },
+});
+export const BusinessSettings = model("BusinessSettings", {
+  key: { ...str, unique: true },
+  phone: String,
+  email: String,
+  whatsapp: String,
+  location: String,
+  address: String,
+  mapUrl: String,
+});
 export const models = {
+  BusinessSettings,
+  Content,
+  Media,
   User,
   Session,
   Recovery,

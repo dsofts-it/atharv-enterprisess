@@ -1,3 +1,8 @@
+import ContentManager from "./ContentManager";
+import { LanguageSwitcher } from "./i18n";
+import { tr } from "./legacyTranslations";
+import InquiryManager from "./InquiryManager";
+import ServiceManager from "./ServiceManager";
 import AuthExperience from "./AuthExperience";
 import DashboardOverview from "./DashboardOverview";
 import { EmptyState } from "./Visual";
@@ -41,6 +46,7 @@ const tabs = [
   ["Notifications", Bell],
   ["Team", Users],
   ["Services", Settings],
+  ["Content", FileText],
   ["Audit log", ShieldCheck],
   ["Settings", Settings],
 ] as const;
@@ -78,7 +84,8 @@ export default function Portal() {
     ([t]) =>
       !(["Caregivers", "Inquiries"].includes(t) && !isOps) &&
       !(
-        ["Team", "Services", "Audit log"].includes(t) && user.role !== "owner"
+        ["Team", "Services", "Content", "Audit log"].includes(t) &&
+        user.role !== "owner"
       ) &&
       !(t === "Billing" && !financial) &&
       !(
@@ -94,11 +101,12 @@ export default function Portal() {
     <div className="portal-shell">
       <aside className={`sidebar ${open ? "open" : ""}`}>
         <Logo />
-        <p className="sidebar-label">YOUR CARE WORKSPACE</p>
+        <LanguageSwitcher />
+        <p className="sidebar-label">{tr("YOUR CARE WORKSPACE")}</p>
         <nav aria-label="Care portal">
           {visible.map(([t, Icon]) => (
             <button
-              key={t}
+              key={tr(t)}
               className={tab === t ? "selected" : ""}
               onClick={() => {
                 setTab(t);
@@ -106,7 +114,7 @@ export default function Portal() {
               }}
             >
               <Icon size={19} />
-              {t}
+              {tr(t)}
             </button>
           ))}
         </nav>
@@ -117,7 +125,7 @@ export default function Portal() {
             <small>{user.role}</small>
           </div>
           <button
-            aria-label="Sign out"
+            aria-label={tr("Sign out")}
             className="icon-button"
             onClick={async () => {
               try {
@@ -143,10 +151,11 @@ export default function Portal() {
             <Menu />
           </button>
           <span>
-            Atharv care / <b>{tab}</b>
+            Atharv care / <b>{tr(tab)}</b>
           </span>
           <Link to="/">
-            Back to website <ArrowUpRight size={15} />
+            {tr("Back to website")}
+            <ArrowUpRight size={15} />
           </Link>
         </div>
         <div className="portal-content">
@@ -157,7 +166,7 @@ export default function Portal() {
                   user.role,
                 )
                   ? "CARE OPERATIONS"
-                  : "YOUR PERSONAL CARE PORTAL"}
+                  : tr("YOUR PERSONAL CARE PORTAL")}
               </p>
               <h1>
                 {tab === "Overview"
@@ -167,12 +176,13 @@ export default function Portal() {
               <p>
                 {tab === "Overview"
                   ? "Here’s where your care journey comes together."
-                  : "Clear information. Thoughtful next steps."}
+                  : tr("Clear information. Thoughtful next steps.")}
               </p>
             </div>
             {user.role === "client" && (
               <Link className="button" to="/request-care">
-                <Plus size={17} /> New care request
+                <Plus size={17} />
+                {tr("New care request")}
               </Link>
             )}
           </div>
@@ -225,7 +235,7 @@ function PortalContent({
                     : tab === "Team"
                       ? "/admin/users"
                       : tab === "Services"
-                        ? "/services"
+                        ? "/admin/services"
                         : tab === "Audit log"
                           ? "/admin/audit-logs"
                           : null;
@@ -233,11 +243,6 @@ function PortalContent({
     queryKey: ["portal", endpoint],
     queryFn: () => api(endpoint!),
     enabled: !!endpoint,
-  });
-  const inquiries = useQuery({
-    queryKey: ["inquiries"],
-    queryFn: () => api("/admin/inquiries"),
-    enabled: tab === "Inquiries" && isOps,
   });
   const assignments = useQuery({
     queryKey: ["portal", "/portal/assignments"],
@@ -420,48 +425,12 @@ function PortalContent({
         )}
         {tab === "Support" && !isOps && (
           <button className="button" onClick={() => openForm("Support")}>
-            <Plus size={16} /> New request
+            <Plus size={16} />
+            {tr("New request")}
           </button>
         )}
       </div>
-      {tab === "Inquiries" && (
-        <section className="paper">
-          <h2>Care conversations</h2>
-          {inquiries.error ? (
-            <ErrorState error={inquiries.error} />
-          ) : inquiries.data?.length ? (
-            inquiries.data.map((i: Row) => (
-              <div className="list-row" key={i._id}>
-                <div>
-                  <b>{i.name}</b>
-                  <p>
-                    {i.service} · {i.locality}
-                  </p>
-                  <p>
-                    {i.email} · {i.phone}
-                  </p>
-                </div>
-                <Status>{i.status}</Status>
-                <button
-                  className="button small secondary"
-                  disabled={busy || i.status !== "new"}
-                  onClick={() =>
-                    act(() =>
-                      patch(`/admin/inquiries/${i._id}`, {
-                        status: "reviewed",
-                      }),
-                    )
-                  }
-                >
-                  Mark reviewed
-                </button>
-              </div>
-            ))
-          ) : (
-            <Empty text="New care inquiries will appear here." />
-          )}
-        </section>
-      )}
+      {tab === "Inquiries" && <InquiryManager owner={user.role === "owner"} />}
       {tab === "Bookings" &&
         (items.length ? (
           items.map((b) => (
@@ -551,7 +520,7 @@ function PortalContent({
             </div>
           ))
         ) : (
-          <Empty text="No care requests to display." />
+          <Empty text={tr("No care requests to display.")} />
         ))}
       {tab === "Caregivers" &&
         (items.length ? (
@@ -614,27 +583,41 @@ function PortalContent({
             <article className="paper list-row" key={s._id}>
               <div>
                 <h3>{date(s.start)}</h3>
-                <p>Until {date(s.end)}</p>
+                <p>
+                  {tr("Until")}
+                  {date(s.end)}
+                </p>
                 <small>Assignment {s.assignmentId}</small>
                 {assignments.data
                   ?.filter((a) => a._id === s.assignmentId)
                   .map((a) => (
                     <div key={a._id}>
                       <p>
-                        Caregiver:{" "}
+                        {tr("Caregiver:")}{" "}
                         {a.caregiver?.displayName ||
                           "Coordinated by the care team"}{" "}
                         · {a.caregiver?.qualification}
                       </p>
                       {a.instructions && (
                         <p className="notice">
-                          Approved instructions: {a.instructions}
+                          {tr("Approved instructions:")}
+                          {a.instructions}
                         </p>
                       )}
                     </div>
                   ))}
-                {s.actualStart && <p>Checked in: {date(s.actualStart)}</p>}
-                {s.actualEnd && <p>Completed: {date(s.actualEnd)}</p>}
+                {s.actualStart && (
+                  <p>
+                    {tr("Checked in:")}
+                    {date(s.actualStart)}
+                  </p>
+                )}
+                {s.actualEnd && (
+                  <p>
+                    {tr("Completed:")}
+                    {date(s.actualEnd)}
+                  </p>
+                )}
                 {s.notes && <p>{s.notes}</p>}
               </div>
               <Status>{s.status}</Status>
@@ -664,26 +647,46 @@ function PortalContent({
             </article>
           ))
         ) : (
-          <Empty text="No shifts scheduled. Confirmed assignments will appear here." />
+          <Empty
+            text={tr(
+              "No shifts scheduled. Confirmed assignments will appear here.",
+            )}
+          />
         ))}
+      {tab === "Agreements" && (
+        <p className="notice">
+          {tr(
+            "Agreement text is shown as issued. Ask the team for clarification in your preferred language before accepting.",
+          )}
+        </p>
+      )}
       {tab === "Agreements" &&
         (items.length ? (
           items.map((a) => (
             <article className="paper agreement-card" key={a._id}>
               <div className="list-row">
-                <h2>{a.kind} care agreement</h2>
+                <h2>
+                  {a.kind}
+                  {tr("care agreement")}
+                </h2>
                 <Status>
-                  {a.acceptedAt ? "Accepted" : "Needs your review"}
+                  {a.acceptedAt ? tr("Accepted") : tr("Needs your review")}
                 </Status>
               </div>
               <p>
-                Version {a.version} · Valid until {date(a.expiresAt)}
+                {tr("Version")}
+                {a.version}
+                {tr("· Valid until")}
+                {date(a.expiresAt)}
               </p>
               <blockquote>{a.text}</blockquote>
               <small className="hash">SHA-256: {a.hash}</small>
               {a.acceptedAt ? (
                 <p>
-                  Accepted by {a.acceptedName} on {date(a.acceptedAt)}
+                  {tr("Accepted by")}
+                  {a.acceptedName}
+                  {tr("on")}
+                  {date(a.acceptedAt)}
                 </p>
               ) : (
                 <>
@@ -695,7 +698,9 @@ function PortalContent({
                         setConsents({ ...consents, [a._id]: e.target.checked })
                       }
                     />
-                    I have read this version and agree to acknowledge it as{" "}
+                    {tr(
+                      "I have read this version and agree to acknowledge it as",
+                    )}{" "}
                     {user.name}.
                   </label>
                   <button
@@ -710,7 +715,7 @@ function PortalContent({
                       )
                     }
                   >
-                    Accept this agreement
+                    {tr("Accept this agreement")}
                   </button>
                 </>
               )}
@@ -718,12 +723,17 @@ function PortalContent({
                 className="text-link"
                 href={apiUrl(`/portal/agreements/${a._id}/pdf`)}
               >
-                <Download size={16} /> Download PDF
+                <Download size={16} />
+                {tr("Download PDF")}
               </a>
             </article>
           ))
         ) : (
-          <Empty text="Your agreements will appear after the team prepares your care arrangement." />
+          <Empty
+            text={tr(
+              "Your agreements will appear after the team prepares your care arrangement.",
+            )}
+          />
         ))}
       {tab === "Billing" &&
         (items.length ? (
@@ -733,11 +743,15 @@ function PortalContent({
                 <h3>{i.number}</h3>
                 <p>{i.description}</p>
                 <p>
-                  Due {i.dueDate} · Total {money(i.totalPaise)}
+                  {tr("Due")}
+                  {i.dueDate}
+                  {tr("· Total")}
+                  {money(i.totalPaise)}
                 </p>
                 <small>
-                  Received {money(i.paidPaise)} · Refunded{" "}
-                  {money(i.refundedPaise)}
+                  {tr("Received")}
+                  {money(i.paidPaise)}
+                  {tr("· Refunded")} {money(i.refundedPaise)}
                 </small>
               </div>
               <Status>{i.status}</Status>
@@ -746,7 +760,8 @@ function PortalContent({
                   className="button secondary small"
                   href={apiUrl(`/portal/invoices/${i._id}/pdf`)}
                 >
-                  <Download size={15} /> Invoice & receipts
+                  <Download size={15} />
+                  {tr("Invoice & receipts")}
                 </a>
                 {financial && (
                   <button
@@ -760,19 +775,29 @@ function PortalContent({
             </article>
           ))
         ) : (
-          <Empty text="No invoices yet. Approved service billing will appear here." />
+          <Empty
+            text={tr(
+              "No invoices yet. Approved service billing will appear here.",
+            )}
+          />
         ))}
       {tab === "Support" &&
         (items.length ? (
           items.map((t) => (
             <article className="paper" key={t._id}>
               <div className="list-row">
-                <h3>{t.type} request</h3>
+                <h3>
+                  {t.type}
+                  {tr("request")}
+                </h3>
                 <Status>{t.status}</Status>
               </div>
               <p>{t.message}</p>
               {t.resolution && (
-                <p className="notice">Team response: {t.resolution}</p>
+                <p className="notice">
+                  {tr("Team response:")}
+                  {t.resolution}
+                </p>
               )}
               <small>{date(t.createdAt)}</small>
               {isOps && (
@@ -786,7 +811,11 @@ function PortalContent({
             </article>
           ))
         ) : (
-          <Empty text="No support requests. Contact the team for changes, concerns or privacy requests." />
+          <Empty
+            text={tr(
+              "No support requests. Contact the team for changes, concerns or privacy requests.",
+            )}
+          />
         ))}
       {tab === "Notifications" &&
         (items.length ? (
@@ -806,13 +835,15 @@ function PortalContent({
                     act(() => post(`/portal/notifications/${n._id}/read`))
                   }
                 >
-                  Mark read
+                  {tr("Mark read")}
                 </button>
               )}
             </article>
           ))
         ) : (
-          <Empty text="You’re all caught up. Care updates will appear here." />
+          <Empty
+            text={tr("You’re all caught up. Care updates will appear here.")}
+          />
         ))}
       {tab === "Team" &&
         items.map((u) => (
@@ -838,26 +869,8 @@ function PortalContent({
             )}
           </article>
         ))}
-      {tab === "Services" &&
-        items.map((s) => (
-          <article className="paper list-row" key={s.slug}>
-            <div>
-              <h3>{s.name}</h3>
-              <p>{s.summary}</p>
-              <small>
-                {s.ratePaise
-                  ? `${money(s.ratePaise)} / ${s.rateUnit}`
-                  : "Quote on assessment"}
-              </small>
-            </div>
-            <button
-              className="button small secondary"
-              onClick={() => openForm("Service", s)}
-            >
-              Edit service
-            </button>
-          </article>
-        ))}
+      {tab === "Services" && <ServiceManager />}
+      {tab === "Content" && <ContentManager />}
       {tab === "Audit log" &&
         (items.length ? (
           <div className="paper table-scroll">
@@ -889,7 +902,7 @@ function PortalContent({
         ))}
       {tab === "Settings" && (
         <div className="paper">
-          <h2>Your profile & security</h2>
+          <h2>{tr("Your profile & security")}</h2>
           <p>
             {user.name}
             <br />
@@ -899,9 +912,9 @@ function PortalContent({
             className="button secondary"
             onClick={() => openForm("Profile", user)}
           >
-            Edit display name
+            {tr("Edit display name")}
           </button>
-          <p>Session changes take effect immediately on the server.</p>
+          <p>{tr("Session changes take effect immediately on the server.")}</p>
           <button
             className="button secondary"
             disabled={busy}
@@ -912,12 +925,12 @@ function PortalContent({
               })
             }
           >
-            Sign out all sessions
+            {tr("Sign out all sessions")}
           </button>
           <p>
-            For access, correction, deletion or account closure, submit a
-            Privacy request from Support. Retained records are reviewed rather
-            than deleted automatically.
+            {tr(
+              "For access, correction, deletion or account closure, submit a Privacy request from Support. Retained records are reviewed rather than deleted automatically.",
+            )}
           </p>
         </div>
       )}
@@ -938,14 +951,14 @@ function PortalContent({
                 setTarget(null);
               }}
             >
-              Close
+              {tr("Close")}
             </button>
           </div>
           <form onSubmit={submit}>
             <FormFields kind={form} target={target} />
             {error && <ErrorState error={new Error(error)} />}
             <button className="button" disabled={busy}>
-              {busy ? "Saving…" : "Save & continue"}
+              {busy ? tr("Saving…") : tr("Save & continue")}
               <ArrowUpRight size={16} />
             </button>
           </form>
@@ -969,12 +982,15 @@ function BookingCard({ b }: { b: Row }) {
       <p>
         {b.preferredName} · {b.locality} · {b.shift}
         <br />
-        Requested start: {b.startDate} · {b.duration} days
+        {tr("Requested start:")}
+        {b.startDate} · {b.duration}
+        {tr("days")}
       </p>
       {b.instructions && <p className="notice">{b.instructions}</p>}
       {b.quotePaise && (
         <p>
-          Proposed quote: <b>{money(b.quotePaise)}</b> · {b.quoteDescription}
+          {tr("Proposed quote:")}
+          <b>{money(b.quotePaise)}</b> · {b.quoteDescription}
         </p>
       )}
       <small>Booking ID: {b._id}</small>
@@ -998,8 +1014,8 @@ function Empty({ text }: { text: string }) {
       type={type}
       title={
         type === "notification"
-          ? "You’re all caught up."
-          : "A little clarity, as care takes shape."
+          ? tr("You’re all caught up.")
+          : tr("A little clarity, as care takes shape.")
       }
       text={text}
     />
@@ -1013,7 +1029,7 @@ function FormFields({ kind, target }: { kind: string; target: Row | null }) {
     value: any = "",
     required = true,
   ) => (
-    <Field key={name} label={label}>
+    <Field key={name} label={tr(label)}>
       <input name={name} type={type} defaultValue={value} required={required} />
     </Field>
   );
@@ -1031,7 +1047,9 @@ function FormFields({ kind, target }: { kind: string; target: Row | null }) {
           <select name="role">
             {["caregiver", "operations", "coordinator", "accountant"].map(
               (t) => (
-                <option key={t}>{t}</option>
+                <option key={t} value={t}>
+                  {tr(t)}
+                </option>
               ),
             )}
           </select>
@@ -1041,7 +1059,7 @@ function FormFields({ kind, target }: { kind: string; target: Row | null }) {
   if (kind === "Support")
     return (
       <>
-        <Field label="Request type">
+        <Field label={tr("Request type")}>
           <select name="type">
             {[
               "Support",
@@ -1059,12 +1077,13 @@ function FormFields({ kind, target }: { kind: string; target: Row | null }) {
           </select>
         </Field>
         {input("bookingId", "Booking ID (optional)", "text", "", false)}
-        <Field label="How can we help?">
+        <Field label={tr("How can we help?")}>
           <textarea name="message" required minLength={10} maxLength={2000} />
         </Field>
         <p className="notice">
-          Requests receive human review. A request does not automatically cancel
-          care, approve leave or change a contract.
+          {tr(
+            "Requests receive human review. A request does not automatically cancel care, approve leave or change a contract.",
+          )}
         </p>
       </>
     );
@@ -1144,6 +1163,7 @@ function FormFields({ kind, target }: { kind: string; target: Row | null }) {
           <select name="qualification">
             <option value="attendant">Non-clinical attendant</option>
             <option value="nurse">Qualified nurse</option>
+            <option value="physiotherapist">Qualified physiotherapist</option>
           </select>
         </Field>
         <Field label="Engagement">

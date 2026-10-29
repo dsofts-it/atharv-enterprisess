@@ -1,3 +1,5 @@
+import { useLanguage } from "./i18n";
+import { tr } from "./legacyTranslations";
 import AuthExperience from "./AuthExperience";
 import { Illustration, Reveal } from "./Visual";
 import { Link, useParams, useNavigate } from "react-router-dom";
@@ -66,7 +68,7 @@ export function ServiceDetail() {
   if (!s) return <NotFound />;
   return (
     <>
-      <PageIntro eyebrow={s.tag} title={s.name}>
+      <PageIntro eyebrow={s.tag} title={tr(s.name)}>
         {s.description}
       </PageIntro>
       <section className="container detail-grid">
@@ -82,7 +84,7 @@ export function ServiceDetail() {
             {s.includes.map((t) => (
               <li key={t}>
                 <Check size={18} />
-                {t}
+                {tr(t)}
               </li>
             ))}
           </ul>
@@ -362,13 +364,13 @@ export function Contact({ careers = false }: { careers?: boolean }) {
                   : "Tell us a little about yourself"}
               </h2>
               <Field
-                label="Your name"
+                label={tr("Your name")}
                 error={form.formState.errors.name?.message}
               >
                 <input {...form.register("name")} autoComplete="name" />
               </Field>
               <Field
-                label="Email address"
+                label={tr("Email address")}
                 error={form.formState.errors.email?.message}
               >
                 <input
@@ -388,7 +390,7 @@ export function Contact({ careers = false }: { careers?: boolean }) {
                 />
               </Field>
               <Field
-                label="Pune locality"
+                label={tr("Pune locality")}
                 error={form.formState.errors.locality?.message}
               >
                 <input
@@ -403,7 +405,7 @@ export function Contact({ careers = false }: { careers?: boolean }) {
                   </option>
                   {services.map((s) => (
                     <option key={s.slug} value={s.slug}>
-                      {s.name}
+                      {tr(s.name)}
                     </option>
                   ))}
                 </select>
@@ -411,7 +413,7 @@ export function Contact({ careers = false }: { careers?: boolean }) {
               <label className="checkbox">
                 <input type="checkbox" {...form.register("consent")} />I agree
                 to be contacted about this inquiry and have read the{" "}
-                <Link to="/privacy-policy">privacy notice</Link>.
+                <Link to="/privacy-policy">{tr("privacy notice")}</Link>.
               </label>
               {form.formState.errors.consent && (
                 <p className="field-error">Please confirm your consent.</p>
@@ -472,10 +474,10 @@ export function ResetPassword() {
   }, []);
   return (
     <section className="container narrow section paper">
-      <h1>Choose a new password.</h1>
+      <h1>{tr("Choose a new password.")}</h1>
       {done ? (
         <Link to="/login" className="button">
-          Return to sign in
+          {tr("Return to sign in")}
         </Link>
       ) : (
         <form
@@ -492,7 +494,7 @@ export function ResetPassword() {
             }
           }}
         >
-          <Field label="New password">
+          <Field label={tr("New password")}>
             <input
               name="password"
               type="password"
@@ -509,6 +511,22 @@ export function ResetPassword() {
 }
 export function RequestCare() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const {
+    data: availableServices = [],
+    isLoading: servicesLoading,
+    error: servicesError,
+  } = useQuery({
+    queryKey: ["services"],
+    queryFn: () =>
+      api<
+        Array<
+          (typeof services)[number] & {
+            translations?: Record<string, { name: string }>;
+          }
+        >
+      >("/services"),
+  });
   const { data: user, isLoading } = useQuery({
     queryKey: ["me"],
     queryFn: () => api("/auth/me"),
@@ -536,6 +554,10 @@ export function RequestCare() {
   async function next() {
     setError("");
     if (step === 1) {
+      if (!availableServices.some((service) => service.slug === data.service)) {
+        setError(tr("Please choose an available service"));
+        return;
+      }
       if (!data.locality || !data.startDate) {
         setError("Choose a locality and start date.");
         return;
@@ -583,29 +605,33 @@ export function RequestCare() {
     return (
       <section className="container section narrow paper success">
         <Check size={48} />
-        <h1>Your care conversation has begun.</h1>
+        <h1>{tr("Your care conversation has begun.")}</h1>
         <p>
-          Request reference <b>{reference}</b>
+          {tr("Request reference")}
+          <b>{reference}</b>
         </p>
         <p>
-          The team will review your request. A caregiver and price are confirmed
-          only after assessment, quote and agreement.
+          {tr(
+            "The team will review your request. A caregiver and price are confirmed only after assessment, quote and agreement.",
+          )}
         </p>
         <Link className="button" to="/portal">
-          Go to your care portal
+          {tr("Go to your care portal")}
         </Link>
       </section>
     );
   return (
     <>
       <PageIntro
-        eyebrow="LET’S FIND THE RIGHT SUPPORT"
-        title="Tell us what care looks like for you."
+        eyebrow={tr("LET’S FIND THE RIGHT SUPPORT")}
+        title={tr("Tell us what care looks like for you.")}
       >
-        A few details help us understand where to start. No payment is taken
-        with your request. Not sure where to begin?{" "}
-        <Link to="/find-care">Use our care guide</Link> or{" "}
-        <Link to="/contact">ask the team without an account</Link>.
+        {tr(
+          "A few details help us understand where to start. No payment is taken with your request. Not sure where to begin?",
+        )}{" "}
+        <Link to="/find-care">{tr("Use our care guide")}</Link>
+        {tr("or")}{" "}
+        <Link to="/contact">{tr("ask the team without an account")}</Link>.
       </PageIntro>
       <section className="container booking-layout">
         <aside>
@@ -622,8 +648,10 @@ export function RequestCare() {
             ))}
           </div>
           <p>
-            <ShieldCheck size={20} /> Your detailed information is shared only
-            through the authenticated care workflow.
+            <ShieldCheck size={20} />
+            {tr(
+              "Your detailed information is shared only through the authenticated care workflow.",
+            )}
           </p>
         </aside>
         <div className="paper">
@@ -631,41 +659,51 @@ export function RequestCare() {
             <Loading />
           ) : (
             <>
-              <p className="eyebrow">STEP {step} OF 3</p>
+              <p className="eyebrow">
+                {tr("Step")} {step} / 3
+              </p>
               <h2>
                 {step === 1
-                  ? "Start with the essentials."
+                  ? tr("Start with the essentials.")
                   : step === 2
-                    ? "Help us understand your needs."
-                    : "Everything look right?"}
+                    ? tr("Help us understand your needs.")
+                    : tr("Everything look right?")}
               </h2>
               {step === 1 ? (
                 <>
-                  <Field label="What kind of care?">
+                  <Field label={tr("What kind of care?")}>
                     <select
-                      value={data.service}
+                      value={
+                        availableServices.some(
+                          (service) => service.slug === data.service,
+                        )
+                          ? data.service
+                          : ""
+                      }
+                      disabled={servicesLoading}
                       onChange={(e) => update("service", e.target.value)}
                     >
-                      {services.map((s) => (
+                      <option value="">{tr("Choose a service")}</option>
+                      {availableServices.map((s) => (
                         <option key={s.slug} value={s.slug}>
-                          {s.name}
+                          {s.translations?.[language]?.name || tr(s.name)}
                         </option>
                       ))}
                     </select>
                   </Field>
                   <div className="form-grid">
-                    <Field label="Pune locality">
+                    <Field label={tr("Pune locality")}>
                       <select
                         value={data.locality}
                         onChange={(e) => update("locality", e.target.value)}
                       >
-                        <option value="">Choose a locality</option>
+                        <option value="">{tr("Choose a locality")}</option>
                         {areas.map((a) => (
                           <option key={a}>{a}</option>
                         ))}
                       </select>
                     </Field>
-                    <Field label="Preferred start date">
+                    <Field label={tr("Preferred start date")}>
                       <input
                         type="date"
                         min={new Date().toISOString().slice(0, 10)}
@@ -673,19 +711,21 @@ export function RequestCare() {
                         onChange={(e) => update("startDate", e.target.value)}
                       />
                     </Field>
-                    <Field label="Preferred shift">
+                    <Field label={tr("Preferred shift")}>
                       <select
                         value={data.shift}
                         onChange={(e) => update("shift", e.target.value)}
                       >
                         {["Day", "Night", "12-hour", "24-hour coverage"].map(
                           (x) => (
-                            <option key={x}>{x}</option>
+                            <option key={x} value={x}>
+                              {tr(x)}
+                            </option>
                           ),
                         )}
                       </select>
                     </Field>
-                    <Field label="Estimated duration (days)">
+                    <Field label={tr("Estimated duration (days)")}>
                       <input
                         type="number"
                         min={1}
@@ -699,32 +739,35 @@ export function RequestCare() {
                   </div>
                   {!user && (
                     <p className="notice">
-                      Next, we’ll ask you to sign in or create an account to
-                      protect your detailed request. Your service, locality,
-                      date, shift and duration choices will be kept.
+                      {tr(
+                        "Next, we’ll ask you to sign in or create an account to protect your detailed request. Your service, locality, date, shift and duration choices will be kept.",
+                      )}
                     </p>
                   )}
                 </>
               ) : step === 2 ? (
                 <>
-                  <Field label="Patient’s preferred name">
+                  <Field label={tr("Patient’s preferred name")}>
                     <input
                       value={data.preferredName}
                       maxLength={80}
                       onChange={(e) => update("preferredName", e.target.value)}
                     />
                   </Field>
-                  <Field label="Relevant support needs (optional)">
+                  <Field label={tr("Relevant support needs (optional)")}>
                     <textarea
                       value={data.instructions}
                       maxLength={1500}
                       onChange={(e) => update("instructions", e.target.value)}
-                      placeholder="Mobility, daily routines, preferred language or accessibility needs. Avoid full medical records or identity numbers."
+                      placeholder={tr(
+                        "Mobility, daily routines, preferred language or accessibility needs. Avoid full medical records or identity numbers.",
+                      )}
                     />
                   </Field>
                   <p className="notice">
-                    Only share information necessary to coordinate care. This
-                    form does not replace a medical assessment.
+                    {tr(
+                      "Only share information necessary to coordinate care. This form does not replace a medical assessment.",
+                    )}
                   </p>
                 </>
               ) : (
@@ -733,7 +776,8 @@ export function RequestCare() {
                     {[
                       [
                         "Service",
-                        services.find((s) => s.slug === data.service)?.name,
+                        availableServices.find((s) => s.slug === data.service)
+                          ?.name,
                       ],
                       ["Locality", data.locality],
                       ["Start date", data.startDate],
@@ -744,16 +788,21 @@ export function RequestCare() {
                       ["Pricing", "Personalized quote after assessment"],
                     ].map(([k, v]) => (
                       <div key={k}>
-                        <dt>{k}</dt>
-                        <dd>{v}</dd>
+                        <dt>{tr(k || "")}</dt>
+                        <dd>{typeof v === "string" ? tr(v) : v}</dd>
                       </div>
                     ))}
                   </dl>
                   <p>
-                    Your request is subject to assessment, availability, quote
-                    acceptance and a separate service agreement. Read the{" "}
-                    <Link to="/booking-terms">booking terms</Link> and{" "}
-                    <Link to="/cancellation-policy">cancellation policy</Link>.
+                    {tr(
+                      "Your request is subject to assessment, availability, quote acceptance and a separate service agreement. Read the",
+                    )}{" "}
+                    <Link to="/booking-terms">{tr("booking terms")}</Link>
+                    {tr("and")}{" "}
+                    <Link to="/cancellation-policy">
+                      {tr("cancellation policy")}
+                    </Link>
+                    .
                   </p>
                   <label className="checkbox">
                     <input
@@ -761,12 +810,14 @@ export function RequestCare() {
                       checked={data.consent}
                       onChange={(e) => update("consent", e.target.checked)}
                     />
-                    I am authorized to request this care and consent to the
-                    minimum necessary processing explained in the{" "}
-                    <Link to="/privacy-policy">privacy notice</Link>.
+                    {tr(
+                      "I am authorized to request this care and consent to the minimum necessary processing explained in the",
+                    )}{" "}
+                    <Link to="/privacy-policy">{tr("privacy notice")}</Link>.
                   </label>
                 </>
               )}
+              {servicesError && <ErrorState error={servicesError} />}
               {error && <ErrorState error={new Error(error)} />}
               <div className="form-actions">
                 {step > 1 && (
@@ -774,15 +825,20 @@ export function RequestCare() {
                     className="button secondary"
                     onClick={() => setStep(step - 1)}
                   >
-                    <ArrowLeft size={16} /> Back
+                    <ArrowLeft size={16} />
+                    {tr("Back")}
                   </button>
                 )}
-                <button className="button" disabled={busy} onClick={next}>
+                <button
+                  className="button"
+                  disabled={busy || servicesLoading || !!servicesError}
+                  onClick={next}
+                >
                   {busy
-                    ? "Submitting…"
+                    ? tr("Submitting…")
                     : step === 3
-                      ? "Submit care request"
-                      : "Continue"}
+                      ? tr("Submit care request")
+                      : tr("Continue")}
                   <ArrowUpRight size={17} />
                 </button>
               </div>
@@ -796,10 +852,10 @@ export function RequestCare() {
 export function NotFound() {
   return (
     <section className="container section narrow">
-      <p className="eyebrow">PAGE NOT FOUND</p>
-      <h1>Let’s get you back to familiar ground.</h1>
+      <p className="eyebrow">{tr("PAGE NOT FOUND")}</p>
+      <h1>{tr("Let’s get you back to familiar ground.")}</h1>
       <Link className="button" to="/">
-        Back to home
+        {tr("Back to home")}
       </Link>
     </section>
   );

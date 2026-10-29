@@ -12,10 +12,11 @@ import { config } from "./config.js";
 import { auth } from "./auth.js";
 import { portal } from "./portal.js";
 import { admin } from "./admin.js";
-import { Service, Inquiry } from "./models.js";
+import { publicContent, contentAdmin } from "./content.js";
+import { Service, Inquiry, User, BusinessSettings } from "./models.js";
 import { services, faqs, areas } from "../../shared/catalog.js";
 import { inquirySchema } from "../../shared/schemas.js";
-import { wrap, ok, HttpError, log } from "./lib.js";
+import { wrap, ok, HttpError, log, id, notify } from "./lib.js";
 export const app = express();
 // Render terminates HTTPS at its reverse proxy. Trust that immediate proxy only.
 if (config.NODE_ENV === "production") app.set("trust proxy", 1);
@@ -61,19 +62,46 @@ app.use(
     },
   }),
 );
-// Reflect the requesting origin: wildcard origins cannot be used with cookies.
-app.use(cors({ origin: true, credentials: true }));
+// Keep the previously requested all-domain mode, with an optional production allowlist.
+// Cookies require an exact reflected origin rather than an ACAO wildcard.
+const allOrigins = config.CORS_ALLOWED_ORIGINS === "*";
+const allowedOrigins = new Set(
+  config.CORS_ALLOWED_ORIGINS.split(",").map((value) => value.trim()),
+);
+app.use(
+  cors({
+    origin: (origin, callback) =>
+      callback(null, allOrigins || !origin || allowedOrigins.has(origin)),
+    credentials: true,
+  }),
+);
+app.use("/api/v1/admin/media", express.json({ limit: "2200kb" }));
+app.use("/api/v1/admin/content", express.json({ limit: "150kb" }));
 app.use(express.json({ limit: "32kb" }));
 app.use(cookieParser());
 app.use("/api", (req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
+  if (
+    !allOrigins &&
+    !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
+    !allowedOrigins.has(req.headers.origin || "")
+  )
+    return res
+      .status(403)
+      .json({ error: { message: "Request origin is not trusted" } });
   next();
 });
 app.use(
   "/api",
   rateLimit({
     windowMs: 60000,
-    limit: 180,
+    // Browser regressions deliberately visit dozens of routes in one minute.
+    limit: config.NODE_ENV === "test" ? 2000 : 180,
+    message: {
+      error: {
+        message: "Too many requests. Please wait a minute and try again.",
+      },
+    },
     standardHeaders: "draft-8",
     legacyHeaders: false,
   }),
@@ -82,7 +110,10 @@ app.use(
   "/api/v1/auth",
   rateLimit({
     windowMs: 15 * 60000,
-    limit: 40,
+    limit: config.NODE_ENV === "test" ? 200 : 40,
+    message: {
+      error: { message: "Too many sign-in attempts. Please try again later." },
+    },
     standardHeaders: "draft-8",
     legacyHeaders: false,
   }),
@@ -98,8 +129,11 @@ app.get("/api/v1/health", (_req, res) =>
 app.get(
   "/api/v1/services",
   wrap(async (_req, res) => {
-    const rows = await Service.find({ active: true });
-    ok(res, rows.length ? rows : services);
+    const rows = await Service.find({ active: true }).sort({
+      sortOrder: 1,
+      createdAt: 1,
+    });
+    ok(res, rows);
   }),
 );
 app.get(
@@ -111,26 +145,76 @@ app.get(
   }),
 );
 app.get("/api/v1/faqs", (_req, res) => ok(res, faqs));
-app.get("/api/v1/public/settings", (_req, res) =>
-  ok(res, {
-    name: "Atharv Enterprises",
-    location: "Pune, Maharashtra",
-    phone: process.env.BUSINESS_PHONE || null,
-    email: process.env.BUSINESS_EMAIL || null,
-    whatsapp: process.env.BUSINESS_WHATSAPP || null,
-    areas,
+app.get(
+  "/api/v1/public/settings",
+  wrap(async (_req, res) => {
+    const business = await BusinessSettings.findOne({ key: "business" });
+    ok(res, {
+      name: "Atharv Enterprises",
+      location: business?.location || "Pune, Maharashtra",
+      phone: business
+        ? business.phone || null
+        : process.env.BUSINESS_PHONE || null,
+      email: business
+        ? business.email || null
+        : process.env.BUSINESS_EMAIL || null,
+      whatsapp: business
+        ? business.whatsapp || null
+        : process.env.BUSINESS_WHATSAPP || null,
+      address: business?.address || null,
+      mapUrl: business?.mapUrl || null,
+      areas,
+    });
   }),
 );
 app.post(
   ["/api/v1/public/inquiries", "/api/v1/public/contact"],
-  rateLimit({ windowMs: 3600000, limit: 10 }),
+  rateLimit({
+    windowMs: 3600000,
+    limit: 10,
+    message: {
+      error: { message: "Too many enquiries. Please try again later." },
+    },
+  }),
   wrap(async (req, res) => {
     const d = inquirySchema.parse(req.body);
-    const i = await Inquiry.create(d);
+    delete d.website;
+    if (
+      d.service !== "General inquiry" &&
+      d.service !== "Career inquiry" &&
+      !(await Service.exists({ slug: d.service, active: true }))
+    )
+      throw new HttpError(400, "Please choose an available service");
+    let i = d.requestId
+      ? await Inquiry.findOne({ requestId: d.requestId })
+      : null;
+    if (!i) {
+      try {
+        i = await Inquiry.create({ ...d, reference: id("ENQ") });
+      } catch (error: any) {
+        if (error.code !== 11000 || !d.requestId) throw error;
+        i = await Inquiry.findOne({ requestId: d.requestId });
+        if (!i) throw error;
+      }
+      // Generic notifications contain no enquiry or patient details.
+      const recipients = await User.find({
+        role: { $in: ["owner", "operations"] },
+        active: true,
+      }).select("_id");
+      await Promise.allSettled(
+        recipients.map((user: any) =>
+          notify(
+            user._id,
+            "A new care enquiry is ready for review.",
+            `inquiry:${i._id}:${user._id}`,
+          ),
+        ),
+      );
+    }
     ok(
       res,
       {
-        reference: String(i._id),
+        reference: i.reference || String(i._id),
         message: "Thank you. Your inquiry has been received.",
       },
       201,
@@ -138,6 +222,8 @@ app.post(
   }),
 );
 app.use("/api/v1/portal", portal);
+app.use("/api/v1/public", publicContent);
+app.use("/api/v1/admin", contentAdmin);
 app.use("/api/v1/admin", admin);
 app.use(
   "/Photos",

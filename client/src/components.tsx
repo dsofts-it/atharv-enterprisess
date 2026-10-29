@@ -1,3 +1,4 @@
+import { tr } from "./legacyTranslations";
 import { Link } from "react-router-dom";
 import Navigation from "./Navigation";
 import { motion } from "motion/react";
@@ -179,7 +180,7 @@ export function Status({ children }: { children: React.ReactNode }) {
       className="status"
       data-status={typeof children === "string" ? children : undefined}
     >
-      {children}
+      {typeof children === "string" ? tr(children) : children}
     </span>
   );
 }
@@ -192,11 +193,11 @@ export function ErrorState({
 }) {
   return (
     <div className="notice error" role="alert">
-      <b>We couldn’t load this information.</b>
-      <p>{error.message}</p>
+      <b>{tr("We couldn’t load this information.")}</b>
+      <p>{tr(error.message)}</p>
       {retry && (
         <button className="button secondary" onClick={retry}>
-          Try again
+          {tr("Try again")}
         </button>
       )}
     </div>

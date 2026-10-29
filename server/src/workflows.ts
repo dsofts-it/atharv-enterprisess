@@ -202,19 +202,19 @@ export async function assignCaregiver(actor: any, input: unknown) {
       "Booking must be confirmed with a billing arrangement",
     );
     const service = await Service.findOne({ slug: b.service }).session(session);
-    assert(service, 400, "Service is unavailable");
+    assert(service?.active, 400, "Service is unavailable");
     assert(
       c.services.includes(b.service) && c.localities.includes(b.locality),
       409,
       "Caregiver is not eligible for this service or locality",
     );
-    if (service.clinical)
+    if (service.clinical || service.requiredQualification)
       assert(
-        c.qualification === "nurse" &&
+        c.qualification === (service.requiredQualification || "nurse") &&
           c.credentialExpiry &&
           c.credentialExpiry > end,
         409,
-        "Valid nursing credentials are required",
+        "Valid credentials for this clinical service are required",
       );
     assert(
       (end.getTime() - start.getTime()) / 3600000 <= c.maxHours,
