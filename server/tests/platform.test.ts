@@ -271,7 +271,7 @@ describe("public access and authentication", () => {
       (
         await agent
           .patch(`/api/v1/admin/services/${draft.body.data._id}`)
-          .send({ active: true })
+          .send({ active: true, image: "orthopedic-care" })
       ).status,
     ).toBe(200);
     await Service.findByIdAndDelete(draft.body.data._id);
@@ -311,7 +311,7 @@ describe("public access and authentication", () => {
   });
   it("allows public browsing", async () => {
     expect((await request(app).get("/api/v1/services")).body.data).toHaveLength(
-      6,
+      services.length,
     );
   });
   it("requires authentication for detailed bookings", async () => {

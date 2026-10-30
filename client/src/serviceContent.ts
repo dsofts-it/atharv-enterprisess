@@ -1,4 +1,5 @@
 import type { Copy } from "./i18n";
+import { services } from "../../shared/catalog";
 export const serviceContent: Record<
   string,
   {
@@ -174,3 +175,103 @@ export const serviceContent: Record<
     image: "bedridden-care",
   },
 };
+
+const additionalHighlights: Record<string, Copy[]> = {
+  "injection-dressing": [
+    [
+      "Injections as prescribed by the doctor",
+      "डॉक्टर के निर्देशानुसार इंजेक्शन",
+      "डॉक्टरांच्या सूचनांनुसार इंजेक्शन",
+    ],
+    [
+      "Dressing and family handover",
+      "ड्रेसिंग और परिवार को जानकारी",
+      "ड्रेसिंग आणि कुटुंबाला माहिती",
+    ],
+  ],
+  "vital-signs-monitoring": [
+    [
+      "Blood pressure, temperature and pulse checks",
+      "रक्तचाप, तापमान और नाड़ी की जाँच",
+      "रक्तदाब, तापमान आणि नाडी तपासणी",
+    ],
+    [
+      "Observation records for the family",
+      "परिवार के लिए जाँच का रिकॉर्ड",
+      "कुटुंबासाठी तपासणीच्या नोंदी",
+    ],
+  ],
+  "medication-assistance": [
+    [
+      "Reminders for prescribed medicines",
+      "निर्धारित दवा लेने की याद दिलाना",
+      "डॉक्टरांनी दिलेली औषधे घेण्याची आठवण",
+    ],
+    [
+      "Help following the prescribed schedule",
+      "निर्धारित समय-सारणी का पालन करने में मदद",
+      "ठरवलेल्या वेळापत्रकानुसार औषधे घेण्यात मदत",
+    ],
+  ],
+  "wound-care": [
+    [
+      "Dressing changes as advised",
+      "सलाह के अनुसार पट्टी बदलना",
+      "सल्ल्यानुसार ड्रेसिंग बदलणे",
+    ],
+    [
+      "Wound hygiene and care observations",
+      "घाव की स्वच्छता और देखभाल की जानकारी",
+      "जखमेची स्वच्छता आणि देखभालीच्या नोंदी",
+    ],
+  ],
+  "physiotherapy-support": [
+    [
+      "Therapist-advised exercises at home",
+      "थेरेपिस्ट की सलाह से घर पर व्यायाम",
+      "तज्ज्ञांच्या सल्ल्यानुसार घरी व्यायाम",
+    ],
+    [
+      "Mobility support and family guidance",
+      "चलने-फिरने में सहायता और परिवार को मार्गदर्शन",
+      "हालचालीत सहाय्य आणि कुटुंबाला मार्गदर्शन",
+    ],
+  ],
+  "mother-baby-care": [
+    [
+      "Newborn hygiene and daily routines",
+      "नवजात की स्वच्छता और दिनचर्या",
+      "नवजात बाळाची स्वच्छता आणि दिनचर्या",
+    ],
+    [
+      "Everyday support and rest for mothers",
+      "माँ के लिए दैनिक सहायता और आराम",
+      "आईसाठी दैनंदिन मदत आणि विश्रांती",
+    ],
+  ],
+};
+
+// Keep every published catalogue service available in all three languages.
+for (const service of services) {
+  if (serviceContent[service.slug]) continue;
+  const summary: Copy = [
+    service.summary,
+    service.translations.hi.summary,
+    service.translations.mr.summary,
+  ];
+  serviceContent[service.slug] = {
+    name: [
+      service.name,
+      service.translations.hi.name,
+      service.translations.mr.name,
+    ],
+    summary,
+    audience: [
+      service.description,
+      service.translations.hi.description,
+      service.translations.mr.description,
+    ],
+    highlights: additionalHighlights[service.slug] || [summary],
+    image: service.image,
+  };
+}

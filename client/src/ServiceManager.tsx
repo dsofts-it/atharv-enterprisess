@@ -5,6 +5,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, patch, post } from "./api";
 import { ErrorState, Loading } from "./components";
 import { serviceDrafts } from "../../shared/serviceDrafts";
+import { services } from "../../shared/catalog";
 export default function ServiceManager() {
   const query = useQuery({
     queryKey: ["admin-services"],
@@ -82,8 +83,7 @@ export default function ServiceManager() {
       <h2>Services and publication</h2>
       <p>
         New services are saved as inactive drafts. Verify business capability,
-        qualifications and service scope before enabling a service. The original
-        six services remain unchanged.
+        qualifications and service scope before enabling a service.
       </p>
       <button
         className="button"
@@ -294,15 +294,18 @@ export default function ServiceManager() {
                 {selected.image?.startsWith("media-") && (
                   <option value={selected.image}>Uploaded photograph</option>
                 )}
-                {[
-                  "home-nursing",
-                  "elderly-care",
-                  "patient-attendant",
-                  "post-operative-care",
-                  "day-night-care",
-                  "bedridden-care",
-                  ...serviceDrafts.map((s) => s[0]),
-                ].map((slug) => (
+                {Array.from(
+                  new Set([
+                    "home-nursing",
+                    "elderly-care",
+                    "patient-attendant",
+                    "post-operative-care",
+                    "day-night-care",
+                    "bedridden-care",
+                    ...services.map((service) => service.image),
+                    ...serviceDrafts.map((s) => s[0]),
+                  ]),
+                ).map((slug) => (
                   <option key={slug}>{slug}</option>
                 ))}
               </select>

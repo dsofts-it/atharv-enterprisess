@@ -891,3 +891,20 @@ html[lang="mr"] h1 {
 .care-photo figcaption {
   font-size: 0.75rem;
 }
+.company-details {
+  margin-block: 24px;
+  overflow-wrap: anywhere;
+}
+.company-details h3 {
+  margin-top: 24px;
+}
+.company-details a {
+  text-underline-offset: 3px;
+}
+.hc-footer a {
+  overflow-wrap: anywhere;
+}
+.hc-service-menu #service-dropdown {
+  max-height: min(70vh, 620px);
+  overflow-y: auto;
+}

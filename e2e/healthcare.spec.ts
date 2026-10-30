@@ -1,6 +1,89 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
+test("company registration and expanded services work in all three languages", async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [language, companyHeading, search, serviceName] of [
+    ["en", "Company details", "Injection", "Injection & dressing"],
+    ["hi", "कंपनी की जानकारी", "इंजेक्शन", "इंजेक्शन और ड्रेसिंग"],
+    ["mr", "कंपनीची माहिती", "इंजेक्शन", "इंजेक्शन व ड्रेसिंग"],
+  ]) {
+    await page.goto("/contact");
+    await page.getByLabel("Language / भाषा").first().selectOption(language);
+    const details = page.locator(".company-details");
+    await expect(
+      details.getByRole("heading", { name: companyHeading, exact: true }),
+    ).toBeVisible();
+    await expect(details).toContainText("UDYAM-MH-26-1192362");
+    for (const number of ["9172662030", "8803602030"])
+      await expect(details.getByRole("link", { name: number })).toHaveAttribute(
+        "href",
+        `tel:+91${number}`,
+      );
+    for (const pin of ["411052", "411018", "411058"])
+      await expect(details).toContainText(pin);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth + 1,
+      ),
+    ).toBeTruthy();
+    await page.goto("/services");
+    await expect(page.locator(".hc-service-card")).toHaveCount(12);
+    await page.locator(".hc-filters input").fill(search);
+    await expect(page.locator(".hc-service-card")).toHaveCount(1);
+    await expect(
+      page.getByRole("heading", { name: serviceName, exact: true }),
+    ).toBeVisible();
+    await page.goto("/services/injection-dressing");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      serviceName,
+    );
+    await expect(page.locator(".hc-detail article img")).toHaveJSProperty(
+      "complete",
+      true,
+    );
+    expect(
+      await page
+        .locator(".hc-detail article img")
+        .evaluate((img: HTMLImageElement) => img.naturalWidth),
+    ).toBeGreaterThan(0);
+    await page.goto("/enquire?service=injection-dressing");
+    await expect(page.locator("#enquiry-service")).toHaveValue(
+      "injection-dressing",
+    );
+    await expect(page.locator("#enquiry-service option:checked")).toHaveText(
+      serviceName,
+    );
+  }
+  await page.goto("/about");
+  await expect(page.locator(".company-details")).toContainText(
+    "UDYAM-MH-26-1192362",
+  );
+  await page.screenshot({
+    path: "output/qa/company-marathi-mobile.png",
+    fullPage: true,
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/services");
+  await page.getByLabel("Language / भाषा").first().selectOption("en");
+  await expect(page.locator(".hc-service-card")).toHaveCount(12);
+  await page.evaluate(async () => {
+    await Promise.all(
+      Array.from(document.images).map(async (image) => {
+        image.loading = "eager";
+        await image.decode();
+      }),
+    );
+  });
+  await page.screenshot({
+    path: "output/qa/expanded-services-desktop.png",
+    fullPage: true,
+  });
+});
+
 test("three languages persist, service filters work and gallery is keyboard accessible", async ({
   page,
 }) => {
@@ -19,10 +102,10 @@ test("three languages persist, service filters work and gallery is keyboard acce
   await page
     .getByRole("button", { name: "वैद्यकीय देखभाल", exact: true })
     .click();
-  await expect(page.locator(".hc-service-card")).toHaveCount(1);
-  await expect(page.locator(".hc-service-card")).toContainText(
-    "घरगुती नर्सिंग",
-  );
+  await expect(page.locator(".hc-service-card")).toHaveCount(6);
+  await expect(
+    page.getByRole("heading", { name: "घरच्या घरी नर्सिंग सेवा", exact: true }),
+  ).toBeVisible();
   await page.goto("/gallery");
   await page.locator(".hc-gallery-button").first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -115,7 +198,7 @@ test("public pages fit phone, tablet and desktop with real images and no runtime
   }
   await page.goto("/");
   await expect(page.locator(".hc-hero h1")).toBeVisible();
-  await expect(page.locator(".hc-service-card")).toHaveCount(6);
+  await expect(page.locator(".hc-service-card")).toHaveCount(12);
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.evaluate(async () => {
     await Promise.all(

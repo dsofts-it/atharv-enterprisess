@@ -1,5 +1,25 @@
 import type { Copy } from "./i18n";
 export const photoDescriptions: Record<string, Copy> = {
+  "injection-dressing": [
+    "Nurse preparing a syringe and dressing supplies during a home visit",
+    "घर पर नर्स इंजेक्शन और ड्रेसिंग की सामग्री तैयार करती हुई",
+    "घरी परिचारिका इंजेक्शन आणि ड्रेसिंगचे साहित्य तयार करताना",
+  ],
+  "vital-signs-monitoring": [
+    "Nurse measuring an older woman's blood pressure and recording the reading",
+    "नर्स बुज़ुर्ग महिला का रक्तचाप जाँचकर उसे दर्ज करता हुआ",
+    "परिचारक ज्येष्ठ महिलेचा रक्तदाब तपासून नोंद करताना",
+  ],
+  "medication-assistance": [
+    "Nurse reviewing a medication schedule with an older man at home",
+    "नर्स घर पर बुज़ुर्ग व्यक्ति के साथ दवा की समय-सारणी देखती हुई",
+    "परिचारिका घरी ज्येष्ठ व्यक्तीसोबत औषधांचे वेळापत्रक पाहताना",
+  ],
+  "wound-care": [
+    "Nurse securing a clean dressing around a patient's forearm at home",
+    "नर्स घर पर मरीज के हाथ पर साफ पट्टी बाँधती हुई",
+    "परिचारिका घरी रुग्णाच्या हातावर स्वच्छ पट्टी बांधताना",
+  ],
   hero: [
     "Indian nurse discussing home care with an older woman and her family",
     "भारतीय नर्स बुज़ुर्ग महिला और परिवार से घर की देखभाल पर चर्चा करती हुई",

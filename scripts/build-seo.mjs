@@ -23,6 +23,12 @@ const paths = [
     "post-operative-care",
     "24-hour-care",
     "bedridden-care",
+    "injection-dressing",
+    "vital-signs-monitoring",
+    "medication-assistance",
+    "wound-care",
+    "physiotherapy-support",
+    "mother-baby-care",
   ].map((s) => "/services/" + s),
 ];
 await mkdir("dist", { recursive: true });

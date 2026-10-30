@@ -31,7 +31,7 @@ describe("public browsing and validation", () => {
     expect(screen.getAllByRole("article")).toHaveLength(6);
     expect(
       screen
-        .getByRole("link", { name: "Explore Home nursing" })
+        .getByRole("link", { name: "Explore Home nursing care" })
         .getAttribute("href"),
     ).toBe("/services/home-nursing");
   });

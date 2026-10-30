@@ -1,3 +1,4 @@
+import { company } from "../../shared/company";
 import { Link, NavLink } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -198,7 +199,11 @@ export function HealthcareFooter() {
               "आपल्या कुटुंबाचा, घराचा आणि निवडीचा आदर करणारी देखभाल.",
             ])}
           </p>
-          <p>{s?.location || "Pune, Maharashtra"}</p>
+          <p>{s?.location || company.location}</p>
+          <p>
+            {t(["Udyam registration", "उद्यम पंजीकरण", "उद्यम नोंदणी"])}:{" "}
+            {company.udyamNumber}
+          </p>
         </div>
         <div>
           <h3>{t(copy.services)}</h3>
@@ -244,8 +249,16 @@ export function HealthcareFooter() {
         </div>
         <div>
           <h3>{t(copy.contact)}</h3>
-          {s?.phone && <a href={`tel:${s.phone}`}>{s.phone}</a>}
-          {s?.email && <a href={`mailto:${s.email}`}>{s.email}</a>}
+          {company.phones.map((phone) => (
+            <a key={phone} href={`tel:+91${phone}`}>
+              {phone}
+            </a>
+          ))}
+          {company.emails.map((email) => (
+            <a key={email} href={`mailto:${email}`}>
+              {email}
+            </a>
+          ))}
           <Link to="/contact">
             {t(["Ask our team", "हमारी टीम से पूछें", "आमच्या संघाला विचारा"])}
           </Link>

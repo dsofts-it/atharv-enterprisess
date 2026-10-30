@@ -17,6 +17,7 @@ import {
   Media,
 } from "./models.js";
 import { serviceDrafts } from "../../shared/serviceDrafts.js";
+import { services } from "../../shared/catalog.js";
 import { wrap, ok, assert, audit, notify, publicUser } from "./lib.js";
 import {
   assignCaregiver,
@@ -61,6 +62,7 @@ async function validateServicePhoto(image: string) {
         "post-operative-care",
         "day-night-care",
         "bedridden-care",
+        ...services.map((service) => service.image),
         ...serviceDrafts.map((service) => service[0]),
       ].includes(image),
       400,

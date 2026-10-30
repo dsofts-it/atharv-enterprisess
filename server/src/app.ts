@@ -1,3 +1,4 @@
+import { company } from "../../shared/company.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -154,10 +155,10 @@ app.get(
       location: business?.location || "Pune, Maharashtra",
       phone: business
         ? business.phone || null
-        : process.env.BUSINESS_PHONE || null,
+        : process.env.BUSINESS_PHONE || company.phones[0],
       email: business
         ? business.email || null
-        : process.env.BUSINESS_EMAIL || null,
+        : process.env.BUSINESS_EMAIL || company.emails[0],
       whatsapp: business
         ? business.whatsapp || null
         : process.env.BUSINESS_WHATSAPP || null,

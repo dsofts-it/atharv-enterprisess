@@ -5,7 +5,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import argon2 from "argon2";
 process.env.NODE_ENV = "test";
 process.env.JWT_ACCESS_SECRET = randomBytes(48).toString("hex");
-process.env.CLIENT_URL = "http://127.0.0.1:5174";
+process.env.CLIENT_URL = `http://127.0.0.1:${process.env.E2E_CLIENT_PORT || "5174"}`;
 process.env.MONGOMS_DOWNLOAD_DIR = resolve(
   "node_modules/.cache/mongodb-memory-server",
 );
@@ -71,8 +71,9 @@ await Invoice.create({
 await mkdir(".runtime", { recursive: true });
 await writeFile(".runtime/e2e-users.json", JSON.stringify(credentials));
 const { app } = await import("../server/src/app.js");
-const server = app.listen(4101, "127.0.0.1", () =>
-  console.log("Isolated E2E API ready on 4101"),
+const apiPort = Number(process.env.E2E_API_PORT || "4101");
+const server = app.listen(apiPort, "127.0.0.1", () =>
+  console.log(`Isolated E2E API ready on ${apiPort}`),
 );
 const shutdown = () =>
   server.close(async () => {

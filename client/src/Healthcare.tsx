@@ -1,3 +1,4 @@
+import { CompanyDetails } from "./CompanyDetails";
 import { CarePhoto } from "./HealthcareLayout";
 import { PublicBlocks } from "./PublicContent";
 import { Link, useParams, useSearchParams } from "react-router-dom";
@@ -92,7 +93,7 @@ export function HealthcareCards({
     (s) =>
       (category === "all" ||
         (category === "clinical" ? s.clinical : !s.clinical)) &&
-      `${s.name} ${s.summary} ${serviceContent[s.slug] ? t(serviceContent[s.slug].name) + t(serviceContent[s.slug].summary) : ""}`
+      `${serviceText(s, "name", language)} ${serviceText(s, "summary", language)} ${s.name}`
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
@@ -870,6 +871,7 @@ export function HealthcareContact() {
           </p>
         )}
         <p className="notice">{t(copy.emergency)}</p>
+        <CompanyDetails />
         <PublicBlocks kind="contact" />
         <CarePhoto slug="hero" />
       </div>
@@ -889,6 +891,7 @@ export function HealthcareAbout() {
           "माणसांच्या गरजांवर आधारित संवेदनशील देखभाल.",
         ])}
       </h1>
+      <CompanyDetails />
       <PublicBlocks kind="about" />
       <div className="hc-enquiry-layout">
         <CarePhoto slug="elderly-care" />

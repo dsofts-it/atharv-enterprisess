@@ -2,10 +2,12 @@ import { resolve } from "node:path";
 import { chromium } from "playwright";
 import { readFile, writeFile, mkdir, copyFile } from "node:fs/promises";
 const manifest = JSON.parse(
-  (await readFile("scripts/healthcare-photo-sources.json", "utf8")).replace(
-    /^\uFEFF/,
-    "",
-  ),
+  (
+    await readFile(
+      process.argv[2] || "scripts/healthcare-photo-sources.json",
+      "utf8",
+    )
+  ).replace(/^\uFEFF/, ""),
 );
 await mkdir("public/images/healthcare", { recursive: true });
 await mkdir("output/imagegen/healthcare", { recursive: true });
