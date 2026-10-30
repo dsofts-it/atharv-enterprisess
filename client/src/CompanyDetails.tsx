@@ -1,5 +1,6 @@
 import { company } from "../../shared/company";
 import { useLanguage } from "./i18n";
+import { ShieldCheck, CheckCircle2, ExternalLink } from "lucide-react";
 
 export function CompanyDetails() {
   const { t } = useLanguage();
@@ -13,11 +14,114 @@ export function CompanyDetails() {
           "अथर्व एंटरप्रायझेस · नर्सेस ब्यूरो सर्व्हिसेस",
         ])}
       </h3>
+
+      <div className="company-verified-card">
+        <div className="company-verified-header">
+          <div className="company-verified-badge">
+            <CheckCircle2 size={18} aria-hidden="true" />
+            <span>
+              {t([
+                "Government Registered & Verified",
+                "शासकीय पंजीकृत एवं सत्यापित",
+                "शासकीय नोंदणीकृत व पडताळणीकृत",
+              ])}
+            </span>
+          </div>
+          <span className="company-verified-validity">
+            {t([
+              "Status: Permanent (No Renewal Required)",
+              "स्थिति: स्थायी (कायमस्वरूपी — नूतनीकरण आवश्यक नाही)",
+              "स्थिती: कायमस्वरूपी (नूतनीकरणाची आवश्यकता नाही)",
+            ])}
+          </span>
+        </div>
+
+        <div className="company-reg-highlight">
+          <span className="company-reg-label">
+            {t([
+              "Maharashtra Shops & Establishments Act Reg. No. (नोंदणी क्रमांक)",
+              "महाराष्ट्र दुकान एवं स्थापना अधिनियम पंजीकरण क्र. (नोंदणी क्रमांक)",
+              "महाराष्ट्र दुकाने व आस्थापना अधिनियम नोंदणी क्रमांक",
+            ])}
+          </span>
+          <span className="company-reg-number">{company.shopActNumber}</span>
+          <span className="company-reg-sub">
+            {t([
+              "Form 'G' Registration Certificate (नमूना 'ग') · Rule 5",
+              "नमूना 'ग' पंजीकरण प्रमाणपत्र · नियम 5",
+              "नमूना 'ग' नोंदणी प्रमाणपत्र · नियम ५",
+            ])}
+          </span>
+        </div>
+
+        <div className="company-verified-grid">
+          <div>
+            <strong>
+              {t(["Establishment Name", "आस्थापना का नाम", "आस्थापनेचे नाव"])}:
+            </strong>{" "}
+            ATHARV ENTERPRISES
+          </div>
+          <div>
+            <strong>
+              {t(["Nature of Business", "व्यवसाय का स्वरूप", "व्यवसायाचे स्वरूप"])}:
+            </strong>{" "}
+            {t([
+              "Ward Boy and Nurses Bureau Services",
+              "वार्ड बॉय और नर्सेस ब्यूरो सेवाएं",
+              "वॉर्ड बॉय आणि नर्सेस ब्युरो सर्व्हिसेस",
+            ])}
+          </div>
+          <div>
+            <strong>
+              {t(["Issuing Authority", "जारीकर्ता प्राधिकरण", "नोंदणी कार्यालय"])}:
+            </strong>{" "}
+            {t([
+              "Office of the Deputy Commissioner of Labour, Pune",
+              "उप श्रम आयुक्त कार्यालय, पुणे (महाराष्ट्र शासन)",
+              "कामगार उपआयुक्त कार्यालय, पुणे (महाराष्ट्र शासन)",
+            ])}
+          </div>
+          <div>
+            <strong>
+              {t(["Registration Date", "पंजीकरण दिनांक", "नोंदणी दिनांक"])}:
+            </strong>{" "}
+            {company.shopActRegistrationDate}
+          </div>
+        </div>
+
+        <div className="company-verify-action">
+          <a
+            href={company.shopActVerifyUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="company-verify-link"
+          >
+            <ShieldCheck size={16} aria-hidden="true" />
+            <span>
+              {t([
+                "Verify authenticity on Aaple Sarkar Govt Portal (aaplesarkar.mahaonline.gov.in)",
+                "आपले सरकार शासकीय पोर्टल पर प्रमाणिकता जांचें (aaplesarkar.mahaonline.gov.in)",
+                "आपले सरकार शासकीय पोर्टलवर प्रमाणिकता पडताळा (aaplesarkar.mahaonline.gov.in)",
+              ])}
+            </span>
+            <ExternalLink size={14} aria-hidden="true" />
+          </a>
+        </div>
+      </div>
+
       <p>
+        <strong>
+          {t([
+            "Contact & Proprietor",
+            "संपर्क एवं प्रोप्राइटर",
+            "संपर्क व प्रोप्रायटर",
+          ])}
+          :{" "}
+        </strong>
         {t([
-          "Contact: Somnath Rajguru",
-          "संपर्क: सोमनाथ राजगुरु",
-          "संपर्क: सोमनाथ राजगुरु",
+          "Somnath Rajguru (Somnath Pralhad Rajguru)",
+          "सोमनाथ राजगुरु (सोमनाथ प्रल्हाद राजगुरु)",
+          "सोमनाथ राजगुरु (सोमनाथ प्रल्हाद राजगुरु)",
         ])}
       </p>
       <p>
@@ -52,7 +156,9 @@ export function CompanyDetails() {
         </p>
       ))}
       <p>
-        <a href={company.website}>www.atharventerprise.in</a>
+        <a href={company.website} target="_blank" rel="noopener noreferrer">
+          {company.websiteDisplay}
+        </a>
       </p>
       <h3>
         {t(["Office addresses", "कार्यालय के पते", "कार्यालयांचे पत्ते"])}

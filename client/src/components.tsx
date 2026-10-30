@@ -6,6 +6,7 @@ import { Illustration, Reveal, Skeleton } from "./Visual";
 import { ArrowUpRight, HeartPulse, MapPin, ArrowRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "./api";
+import { company } from "../../shared/company";
 export function Logo() {
   return (
     <Link to="/" className="brand" aria-label="Atharv Enterprises home">
@@ -62,6 +63,9 @@ export function Footer() {
           <span className="location">
             <MapPin size={15} /> Pune, Maharashtra, India
           </span>
+          <p style={{ fontSize: "0.82rem", marginTop: "6px", opacity: 0.85 }}>
+            Govt. Reg. (Shop Act): <b>{company.shopActNumber}</b>
+          </p>
         </div>
         <div>
           <h3>Explore</h3>

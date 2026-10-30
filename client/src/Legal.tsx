@@ -2,6 +2,8 @@ import { useLanguage } from "./i18n";
 import { legalTranslations } from "./legalTranslations";
 import { useParams, Link } from "react-router-dom";
 import { PageIntro } from "./components";
+import { company } from "../../shared/company";
+import { ShieldCheck } from "lucide-react";
 const content: Record<string, { title: string; sections: [string, string][] }> =
   {
     "privacy-policy": {
@@ -189,6 +191,60 @@ export default function Legal({ page }: { page?: string }) {
             <p>{text}</p>
           </section>
         ))}
+        <section className="legal-statutory-card">
+          <div className="legal-statutory-badge">
+            <ShieldCheck size={18} aria-hidden="true" />
+            <span>
+              {t([
+                "Statutory Business Entity Details",
+                "सांविधिक व्यावसायिक इकाई विवरण",
+                "वैधानिक व्यवसाय अस्तित्व तपशील",
+              ])}
+            </span>
+          </div>
+          <p>
+            <strong>
+              {t(["Legal Name", "कानूनी नाम", "नोंदणीकृत नाव"])}:
+            </strong>{" "}
+            {company.name} ({company.bureau})
+          </p>
+          <p>
+            <strong>
+              {t([
+                "Maharashtra Shops & Establishments Act Reg. No.",
+                "महाराष्ट्र दुकान एवं स्थापना अधिनियम पंजीकरण संख्या",
+                "महाराष्ट्र दुकाने व आस्थापना अधिनियम नोंदणी क्रमांक",
+              ])}
+              :
+            </strong>{" "}
+            <code className="legal-reg-code">{company.shopActNumber}</code>{" "}
+            <span className="legal-verified-pill">
+              ✓ {t(["Permanent / Verified", "स्थायी / सत्यापित", "कायमस्वरूपी / पडताळणीकृत"])}
+            </span>
+          </p>
+          <p>
+            <strong>
+              {t(["Issuing Authority", "जारीकर्ता प्राधिकरण", "नोंदणी कार्यालय"])}:
+            </strong>{" "}
+            {t([
+              company.shopActAuthority,
+              "उप श्रम आयुक्त कार्यालय, पुणे (महाराष्ट्र शासन)",
+              "कामगार उपआयुक्त कार्यालय, पुणे (महाराष्ट्र शासन)",
+            ])}
+          </p>
+          <p>
+            <strong>
+              {t(["Udyam Registration", "उद्यम पंजीकरण", "उद्यम नोंदणी"])}:
+            </strong>{" "}
+            <code>{company.udyamNumber}</code>
+          </p>
+          <p>
+            <strong>
+              {t(["Proprietor", "मालिक", "मालक"])}:
+            </strong>{" "}
+            {company.proprietor}
+          </p>
+        </section>
         <Link className="text-link" to="/contact">
           {t([
             "Contact the care team",

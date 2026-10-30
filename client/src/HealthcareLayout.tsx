@@ -200,6 +200,17 @@ export function HealthcareFooter() {
             ])}
           </p>
           <p>{s?.location || company.location}</p>
+          <p className="hc-footer-reg">
+            <strong>
+              {t([
+                "Govt. Reg. (Shop Act)",
+                "शासकीय पंजीकरण (शॉप एक्ट)",
+                "शासकीय नोंदणी (शॉप ॲक्ट)",
+              ])}
+              :{" "}
+            </strong>
+            <span className="hc-reg-pill">{company.shopActNumber}</span>
+          </p>
           <p>
             {t(["Udyam registration", "उद्यम पंजीकरण", "उद्यम नोंदणी"])}:{" "}
             {company.udyamNumber}

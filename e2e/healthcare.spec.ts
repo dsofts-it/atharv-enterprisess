@@ -18,7 +18,8 @@ test("company registration and expanded services work in all three languages", a
       details.getByRole("heading", { name: companyHeading, exact: true }),
     ).toBeVisible();
     await expect(details).toContainText("UDYAM-MH-26-1192362");
-    for (const number of ["9172662030", "8803602030"])
+    await expect(details).toContainText("2231000316316095");
+    for (const number of ["8803602030", "9172662030"])
       await expect(details.getByRole("link", { name: number })).toHaveAttribute(
         "href",
         `tel:+91${number}`,

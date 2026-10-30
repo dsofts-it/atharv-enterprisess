@@ -180,9 +180,9 @@ export function HealthcareHome() {
           >
             <p className="eyebrow">
               {t([
-                "ATHARV ENTERPRISES · PUNE",
-                "अथर्व एंटरप्राइजेज · पुणे",
-                "अथर्व एंटरप्रायझेस · पुणे",
+                "ATHARV ENTERPRISES · PUNE · GOVT. REG. 2231000316316095",
+                "अथर्व एंटरप्राइजेज · पुणे · शासकीय पंजी. 2231000316316095",
+                "अथर्व एंटरप्रायझेस · पुणे · शासकीय नोंदणी क्र. २२३१०००३१६३१६०९५",
               ])}
             </p>
             <h1>
@@ -234,6 +234,14 @@ export function HealthcareHome() {
       </section>
       <div className="hc-trust container">
         {[
+          [
+            ShieldCheck,
+            [
+              "Govt. Reg. No. 2231000316316095",
+              "शासकीय पंजीकृत: 2231000316316095",
+              "शासकीय नोंदणी क्र. २२३१०००३१६३१६०९५",
+            ],
+          ],
           [
             ShieldCheck,
             [
