@@ -23,14 +23,20 @@ export const company = {
   websiteDisplay: "www.atharventerprisess.com",
   emails: ["somnathrajguru8@gmail.com", "somnath@atharventerprisess.com"],
   phones: ["8803602030", "9172662030"],
+  contacts: {
+    office: "8803602030",
+    private: "9172662030",
+  },
+  whatsapp: ["8803602030", "9172662030"],
   location: "Pune, Maharashtra",
   registeredAddress:
-    "S. No. 35/2, M.Po. 1986/2, Gosavi Wasti, Ramnagar, NDA Road, Near Sanjeevani Hospital, Warje, Pune 411058, Maharashtra",
+    "S. No. 35/2, M.Po. 1986/2, Gosavi Wasti, Ramnagar, N. D. A. Road, Opposite Sanjivani Hospital, Warje Malwadi, Pune 411058, Maharashtra",
   offices: [
     {
       id: "warje",
       label: "Warje",
-      address: "Warje Malwadi, Opp. Sanjeevani Hospital, Pune — 411052",
+      address:
+        "N. D. A. Road, Warje Malwadi, Opposite Sanjivani Hospital, Pune — 411052",
     },
     {
       id: "pimpri",

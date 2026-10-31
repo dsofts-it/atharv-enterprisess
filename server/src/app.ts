@@ -161,7 +161,7 @@ app.get(
         : process.env.BUSINESS_EMAIL || company.emails[0],
       whatsapp: business
         ? business.whatsapp || null
-        : process.env.BUSINESS_WHATSAPP || null,
+        : process.env.BUSINESS_WHATSAPP || company.phones[0],
       address: business?.address || null,
       mapUrl: business?.mapUrl || null,
       areas,

@@ -260,11 +260,38 @@ export function HealthcareFooter() {
         </div>
         <div>
           <h3>{t(copy.contact)}</h3>
-          {company.phones.map((phone) => (
-            <a key={phone} href={`tel:+91${phone}`}>
-              {phone}
-            </a>
-          ))}
+          <a href={`tel:+91${company.phones[0]}`}>
+            {company.phones[0]} ({t(["Office", "कार्यालय", "कार्यालय"])})
+          </a>
+          <a href={`tel:+91${company.phones[1]}`}>
+            {company.phones[1]} ({t(["Private", "व्यक्तिगत", "खाजगी"])})
+          </a>
+          <a
+            href={`https://wa.me/91${company.phones[0]}?text=${encodeURIComponent(
+              t([
+                "Hello Atharv Enterprises, I would like to enquire about home care services.",
+                "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+                "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+              ]),
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp ({company.phones[0]} - {t(["Office", "कार्यालय", "कार्यालय"])})
+          </a>
+          <a
+            href={`https://wa.me/91${company.phones[1]}?text=${encodeURIComponent(
+              t([
+                "Hello Atharv Enterprises, I would like to enquire about home care services.",
+                "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+                "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+              ]),
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp ({company.phones[1]} - {t(["Private", "व्यक्तिगत", "खाजगी"])})
+          </a>
           {company.emails.map((email) => (
             <a key={email} href={`mailto:${email}`}>
               {email}
@@ -312,22 +339,42 @@ export function QuickContact() {
           <Link className="button" to="/enquire" onClick={() => setOpen(false)}>
             {t(copy.enquire)}
           </Link>
-          {s?.phone && (
-            <a href={`tel:${s.phone}`}>
-              <Phone size={17} />
-              {t(["Call the team", "टीम को कॉल करें", "संघाला फोन करा"])}
-            </a>
-          )}
-          {number && (
-            <a
-              href={`https://wa.me/${number}?text=${encodeURIComponent(t(["Hello Atharv Enterprises, I would like to enquire about home care services.", "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।", "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे."]))}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              WhatsApp
-              <ArrowUpRight size={16} />
-            </a>
-          )}
+          <a href={`tel:+91${company.phones[0]}`}>
+            <Phone size={17} />
+            {company.phones[0]} ({t(["Office", "कार्यालय", "कार्यालय"])})
+          </a>
+          <a href={`tel:+91${company.phones[1]}`}>
+            <Phone size={17} />
+            {company.phones[1]} ({t(["Private", "व्यक्तिगत", "खाजगी"])})
+          </a>
+          <a
+            href={`https://wa.me/91${company.phones[0]}?text=${encodeURIComponent(
+              t([
+                "Hello Atharv Enterprises, I would like to enquire about home care services.",
+                "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+                "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+              ]),
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp ({company.phones[0]} - {t(["Office", "कार्यालय", "कार्यालय"])})
+            <ArrowUpRight size={16} />
+          </a>
+          <a
+            href={`https://wa.me/91${company.phones[1]}?text=${encodeURIComponent(
+              t([
+                "Hello Atharv Enterprises, I would like to enquire about home care services.",
+                "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+                "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+              ]),
+            )}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            WhatsApp ({company.phones[1]} - {t(["Private", "व्यक्तिगत", "खाजगी"])})
+            <ArrowUpRight size={16} />
+          </a>
         </div>
       )}
       <button

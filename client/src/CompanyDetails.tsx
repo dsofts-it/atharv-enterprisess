@@ -143,12 +143,41 @@ export function CompanyDetails() {
         ])}
       </p>
       <p>
-        {company.phones.map((phone, i) => (
-          <span key={phone}>
-            {i > 0 && " / "}
-            <a href={`tel:+91${phone}`}>{phone}</a>
-          </span>
-        ))}
+        <strong>{t(["Office Phone", "कार्यालय फोन", "कार्यालयीन फोन"])}: </strong>
+        <a href={`tel:+91${company.phones[0]}`}>{company.phones[0]}</a>
+        {" · "}
+        <strong>{t(["Private Phone", "व्यक्तिगत फोन", "खाजगी फोन"])}: </strong>
+        <a href={`tel:+91${company.phones[1]}`}>{company.phones[1]}</a>
+      </p>
+      <p>
+        <strong>{t(["WhatsApp", "व्हाट्सएप", "व्हॉट्सॲप"])}: </strong>
+        <a
+          href={`https://wa.me/91${company.phones[0]}?text=${encodeURIComponent(
+            t([
+              "Hello Atharv Enterprises, I would like to enquire about home care services.",
+              "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+              "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+            ]),
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {company.phones[0]} ({t(["Office - 1st Priority", "कार्यालय - मुख्य", "कार्यालय - मुख्य"])})
+        </a>
+        {" · "}
+        <a
+          href={`https://wa.me/91${company.phones[1]}?text=${encodeURIComponent(
+            t([
+              "Hello Atharv Enterprises, I would like to enquire about home care services.",
+              "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
+              "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
+            ]),
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {company.phones[1]} ({t(["Private", "व्यक्तिगत", "खाजगी"])})
+        </a>
       </p>
       {company.emails.map((email) => (
         <p key={email}>
@@ -167,8 +196,8 @@ export function CompanyDetails() {
         <strong>{t(["Warje", "वारजे", "वारजे"])}: </strong>
         {t([
           company.offices[0].address,
-          "वारजे मालवाड़ी, संजीवनी अस्पताल के सामने, पुणे — 411052",
-          "वारजे माळवाडी, संजीवनी रुग्णालयासमोर, पुणे — 411052",
+          "एन. डी. ए. रोड, वारजे मालवाड़ी, संजीवनी अस्पताल के सामने, पुणे — 411052",
+          "एन. डी. ए. रोड, वारजे माळवाडी, संजीवनी रुग्णालयासमोर, पुणे — 411052",
         ])}
       </p>
       <p>
@@ -189,8 +218,8 @@ export function CompanyDetails() {
       <p>
         {t([
           company.registeredAddress,
-          "सर्वे नं. 35/2, एम.पो. 1986/2, गोसावी बस्ती, रामनगर, एनडीए रोड, संजीवनी अस्पताल के पास, वारजे, पुणे 411058, महाराष्ट्र",
-          "सर्वे नं. 35/2, एम.पो. 1986/2, गोसावी वस्ती, रामनगर, एनडीए रोड, संजीवनी रुग्णालयाजवळ, वारजे, पुणे 411058, महाराष्ट्र",
+          "सर्वे नं. 35/2, एम.पो. 1986/2, गोसावी बस्ती, रामनगर, एन. डी. ए. रोड, संजीवनी अस्पताल के सामने, वारजे मालवाड़ी, पुणे 411058, महाराष्ट्र",
+          "सर्वे नं. 35/2, एम.पो. 1986/2, गोसावी वस्ती, रामनगर, एन. डी. ए. रोड, संजीवनी रुग्णालयासमोर, वारजे माळवाडी, पुणे 411058, महाराष्ट्र",
         ])}
       </p>
     </section>
