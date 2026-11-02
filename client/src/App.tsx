@@ -1,3 +1,4 @@
+import { EnquiryForm } from "./EnquiryForm";
 import { usePageMetadata } from "./SEO";
 import { ResourcesPage } from "./PublicContent";
 import { useLanguage } from "./i18n";
@@ -11,13 +12,7 @@ import {
 } from "./HealthcareLayout";
 
 import { ScrollProgress } from "./ScrollProgress";
-import {
-  Contact as CareerContact,
-  AuthPage,
-  ResetPassword,
-  RequestCare,
-  NotFound,
-} from "./Pages";
+import { AuthPage, ResetPassword, RequestCare, NotFound } from "./Pages";
 import Legal, { legalPaths } from "./Legal";
 const Home = lazy(() =>
   import("./Healthcare").then((module) => ({ default: module.HealthcareHome })),
@@ -88,7 +83,14 @@ export default function App() {
             <Route path="/enquire" element={<Contact />} />
             <Route path="/gallery" element={<HealthcareGallery />} />
             <Route path="/resources" element={<ResourcesPage />} />
-            <Route path="/careers" element={<CareerContact careers />} />
+            <Route
+              path="/careers"
+              element={
+                <section className="container hc-section">
+                  <EnquiryForm careers />
+                </section>
+              }
+            />
             <Route path="/login" element={<AuthPage />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/request-care" element={<RequestCare />} />

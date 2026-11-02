@@ -49,3 +49,13 @@ Sign in with the existing owner account. If no owner exists, use the existing `s
 - Recheck the preserved private booking, agreement, shift, billing/PDF and support workflows.
 
 The code and generated images are local changes until committed, pushed and deployed. These instructions do not claim a live deployment or alter a hosting account.
+
+## WhatsApp enquiries and owner gallery
+
+Public enquiries at `/enquire`, `/contact` and `/careers` open a prepared message to company WhatsApp **+91 8803602030**. The visitor must press Send in WhatsApp; opening the draft does not prove delivery. These public forms do not create database enquiries. Existing portal records remain available.
+
+The message includes the visitor's name, role, phone, area, requirements/experience, acknowledgement of the displayed company policy, and submission time in Asia/Kolkata. English, Hindi and Marathi are supported. The policy describes company requirements subject to signed agreements and applicable law; it does not claim private engagement is automatically illegal.
+
+Owners sign in at `/login`, open **Content**, and select **Add gallery photo**. Upload a PNG, JPEG or WebP (up to 1.5 MB), provide image descriptions and captions in all three languages, confirm publication rights, approve and publish. Published photos appear first at `/gallery`. Clear publication to hide a photo. Media is stored in MongoDB, so uploads persist across server deploys. Existing owner-only authorization protects publishing and uploads.
+
+If an owner account has not been provisioned, configure `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD` in the server environment and run `npm run setup:admin` against the intended database. Remove the temporary password afterwards. The setup command refuses to create a second owner. Never put these credentials in client environment variables.

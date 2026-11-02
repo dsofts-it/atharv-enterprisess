@@ -1045,7 +1045,27 @@ export function HealthcareGallery() {
           "घरगुती देखभालीची एक झलक.",
         ])}
       </h1>
-      <p className="hc-lead">{t(copy.ai)}</p>
+      <p className="hc-lead">
+        {t([
+          "Company photographs and care illustrations.",
+          "कंपनी के चित्र और देखभाल के उदाहरण।",
+          "कंपनीची छायाचित्रे आणि देखभालीची उदाहरणे.",
+        ])}
+      </p>
+      <PublicBlocks kind="gallery" />
+      <p>
+        <Link to="/login">
+          {t([
+            "Owner login — manage gallery photos",
+            "मालिक लॉगिन — गैलरी के चित्र प्रबंधित करें",
+            "मालक लॉगिन — गॅलरीची छायाचित्रे व्यवस्थापित करा",
+          ])}
+        </Link>
+      </p>
+      <h2>
+        {t(["Care illustrations", "देखभाल के उदाहरण", "देखभालीची उदाहरणे"])}
+      </h2>
+      <p>{t(copy.ai)}</p>
       <div className="hc-filters">
         <div>
           {[
@@ -1085,7 +1105,6 @@ export function HealthcareGallery() {
             </button>
           ))}
       </div>
-      <PublicBlocks kind="gallery" />
       {active && (
         <GalleryDialog service={active} close={() => setActive(null)} />
       )}

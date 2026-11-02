@@ -63,7 +63,12 @@ export function CompanyDetails() {
           </div>
           <div>
             <strong>
-              {t(["Nature of Business", "व्यवसाय का स्वरूप", "व्यवसायाचे स्वरूप"])}:
+              {t([
+                "Nature of Business",
+                "व्यवसाय का स्वरूप",
+                "व्यवसायाचे स्वरूप",
+              ])}
+              :
             </strong>{" "}
             {t([
               "Ward Boy and Nurses Bureau Services",
@@ -73,7 +78,12 @@ export function CompanyDetails() {
           </div>
           <div>
             <strong>
-              {t(["Issuing Authority", "जारीकर्ता प्राधिकरण", "नोंदणी कार्यालय"])}:
+              {t([
+                "Issuing Authority",
+                "जारीकर्ता प्राधिकरण",
+                "नोंदणी कार्यालय",
+              ])}
+              :
             </strong>{" "}
             {t([
               "Office of the Deputy Commissioner of Labour, Pune",
@@ -143,7 +153,9 @@ export function CompanyDetails() {
         ])}
       </p>
       <p>
-        <strong>{t(["Office Phone", "कार्यालय फोन", "कार्यालयीन फोन"])}: </strong>
+        <strong>
+          {t(["Office Phone", "कार्यालय फोन", "कार्यालयीन फोन"])}:{" "}
+        </strong>
         <a href={`tel:+91${company.phones[0]}`}>{company.phones[0]}</a>
         {" · "}
         <strong>{t(["Private Phone", "व्यक्तिगत फोन", "खाजगी फोन"])}: </strong>
@@ -162,21 +174,9 @@ export function CompanyDetails() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          {company.phones[0]} ({t(["Office - 1st Priority", "कार्यालय - मुख्य", "कार्यालय - मुख्य"])})
-        </a>
-        {" · "}
-        <a
-          href={`https://wa.me/91${company.phones[1]}?text=${encodeURIComponent(
-            t([
-              "Hello Atharv Enterprises, I would like to enquire about home care services.",
-              "नमस्ते अथर्व एंटरप्राइजेज, मुझे घर की देखभाल सेवाओं के बारे में जानकारी चाहिए।",
-              "नमस्कार अथर्व एंटरप्रायझेस, मला घरगुती देखभाल सेवांबद्दल माहिती हवी आहे.",
-            ]),
-          )}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {company.phones[1]} ({t(["Private", "व्यक्तिगत", "खाजगी"])})
+          {company.phones[0]} (
+          {t(["Office - 1st Priority", "कार्यालय - मुख्य", "कार्यालय - मुख्य"])}
+          )
         </a>
       </p>
       {company.emails.map((email) => (

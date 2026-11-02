@@ -1,6 +1,7 @@
+import { useLanguage } from "./i18n";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, patch, post } from "./api";
+import { api, apiUrl, patch, post } from "./api";
 import { Loading, ErrorState } from "./components";
 
 export function MediaUpload({
@@ -88,6 +89,7 @@ export function MediaUpload({
   );
 }
 export default function ContentManager() {
+  const { t } = useLanguage();
   const query = useQuery({
     queryKey: ["admin-content"],
     queryFn: () => api<any[]>("/admin/content"),
@@ -100,7 +102,47 @@ export default function ContentManager() {
   return (
     <section className="paper">
       <BusinessContactEditor />
-      <h2>Website content</h2>
+      <h2>
+        {t([
+          "Website content & photo gallery",
+          "वेबसाइट सामग्री और फोटो गैलरी",
+          "वेबसाइट मजकूर आणि फोटो गॅलरी",
+        ])}
+      </h2>
+      <p>
+        {t([
+          "Add a photo, upload it, enter captions in English, Hindi and Marathi, then approve and publish. To hide a photo, edit it and clear Publish on the website.",
+          "चित्र जोड़ें, अपलोड करें, अंग्रेज़ी, हिंदी और मराठी में विवरण भरें, फिर स्वीकृत करके प्रकाशित करें। चित्र छिपाने के लिए उसे संपादित करें और प्रकाशन हटाएँ।",
+          "छायाचित्र जोडा, अपलोड करा, इंग्रजी, हिंदी आणि मराठीत वर्णन भरा, नंतर मंजूर करून प्रकाशित करा. छायाचित्र लपवण्यासाठी संपादित करून प्रकाशन रद्द करा.",
+        ])}
+      </p>
+      <a href="/gallery" target="_blank" rel="noopener noreferrer">
+        {t([
+          "Preview public gallery",
+          "सार्वजनिक गैलरी देखें",
+          "सार्वजनिक गॅलरी पहा",
+        ])}
+      </a>
+      <button
+        className="button"
+        onClick={() => {
+          setSelected({
+            kind: "gallery",
+            slug: `photo-${Date.now()}`,
+            title: {},
+            body: {},
+            sortOrder: 0,
+          });
+          setImageId("");
+          setError("");
+        }}
+      >
+        {t([
+          "Add gallery photo",
+          "गैलरी में चित्र जोड़ें",
+          "गॅलरीत छायाचित्र जोडा",
+        ])}
+      </button>
       <p>
         Manage banners, about content, FAQs, approved testimonials, gallery
         photos, video links, family guides and contact information. Drafts are
@@ -166,6 +208,16 @@ export default function ContentManager() {
           </button>
           <h2>Content editor</h2>
           <MediaUpload onUploaded={(id) => setImageId(id)} />
+          {imageId && (
+            <figure className="care-photo">
+              <img
+                src={apiUrl(`/public/media/${imageId}`)}
+                alt="Selected gallery upload"
+                width={600}
+                height={400}
+              />
+            </figure>
+          )}
           <form
             key={selected._id || "new"}
             onSubmit={async (event) => {
