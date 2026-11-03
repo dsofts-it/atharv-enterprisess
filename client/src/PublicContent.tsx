@@ -15,7 +15,9 @@ export function PublicBlocks({ kind }: { kind: string }) {
   const rows = data.filter((row) => row.kind === kind);
   if (!rows.length) return null;
   return (
-    <div className="hc-content-blocks">
+    <div
+      className={`hc-content-blocks ${kind === "gallery" ? "public-photo-gallery" : ""}`}
+    >
       {rows.map((row) => (
         <article key={row._id} className="paper" id={row.slug}>
           {row.imageId && (
@@ -38,7 +40,9 @@ export function PublicBlocks({ kind }: { kind: string }) {
               </figcaption>
             </figure>
           )}
-          <h2>{row.title[language]}</h2>
+          {!(kind === "gallery" && row.title.en === "Gallery photo") && (
+            <h2>{row.title[language]}</h2>
+          )}
           <p style={{ whiteSpace: "pre-line" }}>{row.body[language]}</p>
           {row.externalUrl && (
             <a href={row.externalUrl} target="_blank" rel="noopener noreferrer">

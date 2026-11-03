@@ -1,3 +1,4 @@
+import GalleryManager from "./GalleryManager";
 import { useLanguage } from "./i18n";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -101,276 +102,284 @@ export default function ContentManager() {
   const [error, setError] = useState("");
   return (
     <section className="paper">
-      <BusinessContactEditor />
-      <h2>
-        {t([
-          "Website content & photo gallery",
-          "वेबसाइट सामग्री और फोटो गैलरी",
-          "वेबसाइट मजकूर आणि फोटो गॅलरी",
-        ])}
-      </h2>
-      <p>
-        {t([
-          "Add a photo, upload it, enter captions in English, Hindi and Marathi, then approve and publish. To hide a photo, edit it and clear Publish on the website.",
-          "चित्र जोड़ें, अपलोड करें, अंग्रेज़ी, हिंदी और मराठी में विवरण भरें, फिर स्वीकृत करके प्रकाशित करें। चित्र छिपाने के लिए उसे संपादित करें और प्रकाशन हटाएँ।",
-          "छायाचित्र जोडा, अपलोड करा, इंग्रजी, हिंदी आणि मराठीत वर्णन भरा, नंतर मंजूर करून प्रकाशित करा. छायाचित्र लपवण्यासाठी संपादित करून प्रकाशन रद्द करा.",
-        ])}
-      </p>
-      <a href="/gallery" target="_blank" rel="noopener noreferrer">
-        {t([
-          "Preview public gallery",
-          "सार्वजनिक गैलरी देखें",
-          "सार्वजनिक गॅलरी पहा",
-        ])}
-      </a>
-      <button
-        className="button"
-        onClick={() => {
-          setSelected({
-            kind: "gallery",
-            slug: `photo-${Date.now()}`,
-            title: {},
-            body: {},
-            sortOrder: 0,
-          });
-          setImageId("");
-          setError("");
-        }}
-      >
-        {t([
-          "Add gallery photo",
-          "गैलरी में चित्र जोड़ें",
-          "गॅलरीत छायाचित्र जोडा",
-        ])}
-      </button>
-      <p>
-        Manage banners, about content, FAQs, approved testimonials, gallery
-        photos, video links, family guides and contact information. Drafts are
-        private. All three languages are required for titles.
-      </p>
-      <button
-        className="button"
-        onClick={() => {
-          setSelected({
-            kind: "blog",
-            slug: "",
-            title: {},
-            body: {},
-            sortOrder: 0,
-          });
-          setImageId("");
-          setError("");
-        }}
-      >
-        Add content
-      </button>
-      {query.isLoading ? (
-        <Loading />
-      ) : query.error ? (
-        <ErrorState error={query.error} />
-      ) : (
-        query.data?.map((row) => (
-          <div key={row._id} className="list-row">
-            <div>
-              <strong>{row.title.en}</strong>
-              <p>
-                {row.kind} ·{" "}
-                {row.published && row.approved ? "Published" : "Draft"}
-              </p>
+      <GalleryManager />
+      <details>
+        <summary>Other website content and settings</summary>
+        <BusinessContactEditor />
+        <h2>
+          {t([
+            "Website content & photo gallery",
+            "वेबसाइट सामग्री और फोटो गैलरी",
+            "वेबसाइट मजकूर आणि फोटो गॅलरी",
+          ])}
+        </h2>
+        <p>
+          {t([
+            "Add a photo, upload it, enter captions in English, Hindi and Marathi, then approve and publish. To hide a photo, edit it and clear Publish on the website.",
+            "चित्र जोड़ें, अपलोड करें, अंग्रेज़ी, हिंदी और मराठी में विवरण भरें, फिर स्वीकृत करके प्रकाशित करें। चित्र छिपाने के लिए उसे संपादित करें और प्रकाशन हटाएँ।",
+            "छायाचित्र जोडा, अपलोड करा, इंग्रजी, हिंदी आणि मराठीत वर्णन भरा, नंतर मंजूर करून प्रकाशित करा. छायाचित्र लपवण्यासाठी संपादित करून प्रकाशन रद्द करा.",
+          ])}
+        </p>
+        <a href="/gallery" target="_blank" rel="noopener noreferrer">
+          {t([
+            "Preview public gallery",
+            "सार्वजनिक गैलरी देखें",
+            "सार्वजनिक गॅलरी पहा",
+          ])}
+        </a>
+        <button
+          className="button"
+          onClick={() => {
+            setSelected({
+              kind: "gallery",
+              slug: `photo-${Date.now()}`,
+              title: {},
+              body: {},
+              sortOrder: 0,
+            });
+            setImageId("");
+            setError("");
+          }}
+        >
+          {t([
+            "Add gallery photo",
+            "गैलरी में चित्र जोड़ें",
+            "गॅलरीत छायाचित्र जोडा",
+          ])}
+        </button>
+        <p>
+          Manage banners, about content, FAQs, approved testimonials, gallery
+          photos, video links, family guides and contact information. Drafts are
+          private. All three languages are required for titles.
+        </p>
+        <button
+          className="button"
+          onClick={() => {
+            setSelected({
+              kind: "blog",
+              slug: "",
+              title: {},
+              body: {},
+              sortOrder: 0,
+            });
+            setImageId("");
+            setError("");
+          }}
+        >
+          Add content
+        </button>
+        {query.isLoading ? (
+          <Loading />
+        ) : query.error ? (
+          <ErrorState error={query.error} />
+        ) : (
+          query.data?.map((row) => (
+            <div key={row._id} className="list-row">
+              <div>
+                <strong>{row.title.en}</strong>
+                <p>
+                  {row.kind} ·{" "}
+                  {row.published && row.approved ? "Published" : "Draft"}
+                </p>
+              </div>
+              <button
+                className="button secondary small"
+                onClick={() => {
+                  setSelected(row);
+                  setImageId(row.imageId || "");
+                  setError("");
+                }}
+              >
+                Edit content
+              </button>
             </div>
+          ))
+        )}
+        {selected && (
+          <dialog
+            className="hc-admin-dialog"
+            ref={(node) => {
+              if (node && !node.open) node.showModal();
+            }}
+            onCancel={() => setSelected(null)}
+          >
             <button
               className="button secondary small"
-              onClick={() => {
-                setSelected(row);
-                setImageId(row.imageId || "");
+              autoFocus
+              onClick={() => setSelected(null)}
+            >
+              Close editor
+            </button>
+            <h2>Content editor</h2>
+            <MediaUpload onUploaded={(id) => setImageId(id)} />
+            {imageId && (
+              <figure className="care-photo">
+                <img
+                  src={apiUrl(`/public/media/${imageId}`)}
+                  alt="Selected gallery upload"
+                  width={600}
+                  height={400}
+                />
+              </figure>
+            )}
+            <form
+              key={selected._id || "new"}
+              onSubmit={async (event) => {
+                event.preventDefault();
+                if (busy) return;
+                setBusy(true);
                 setError("");
+                const v: any = Object.fromEntries(
+                  new FormData(event.currentTarget),
+                );
+                const data = {
+                  kind: v.kind,
+                  slug: v.slug,
+                  title: {
+                    en: v["title-en"],
+                    hi: v["title-hi"],
+                    mr: v["title-mr"],
+                  },
+                  body: {
+                    en: v["body-en"],
+                    hi: v["body-hi"],
+                    mr: v["body-mr"],
+                  },
+                  imageId: imageId || null,
+                  externalUrl: v.externalUrl || "",
+                  approved: v.approved === "on",
+                  published: v.published === "on",
+                  sortOrder: Number(v.sortOrder),
+                };
+                try {
+                  if (selected._id)
+                    await patch(`/admin/content/${selected._id}`, data);
+                  else await post("/admin/content", data);
+                  await qc.invalidateQueries({ queryKey: ["admin-content"] });
+                  await qc.invalidateQueries({ queryKey: ["public-content"] });
+                  setSelected(null);
+                } catch (e) {
+                  setError((e as Error).message);
+                } finally {
+                  setBusy(false);
+                }
               }}
             >
-              Edit content
-            </button>
-          </div>
-        ))
-      )}
-      {selected && (
-        <dialog
-          className="hc-admin-dialog"
-          ref={(node) => {
-            if (node && !node.open) node.showModal();
-          }}
-          onCancel={() => setSelected(null)}
-        >
-          <button
-            className="button secondary small"
-            autoFocus
-            onClick={() => setSelected(null)}
-          >
-            Close editor
-          </button>
-          <h2>Content editor</h2>
-          <MediaUpload onUploaded={(id) => setImageId(id)} />
-          {imageId && (
-            <figure className="care-photo">
-              <img
-                src={apiUrl(`/public/media/${imageId}`)}
-                alt="Selected gallery upload"
-                width={600}
-                height={400}
-              />
-            </figure>
-          )}
-          <form
-            key={selected._id || "new"}
-            onSubmit={async (event) => {
-              event.preventDefault();
-              if (busy) return;
-              setBusy(true);
-              setError("");
-              const v: any = Object.fromEntries(
-                new FormData(event.currentTarget),
-              );
-              const data = {
-                kind: v.kind,
-                slug: v.slug,
-                title: {
-                  en: v["title-en"],
-                  hi: v["title-hi"],
-                  mr: v["title-mr"],
-                },
-                body: { en: v["body-en"], hi: v["body-hi"], mr: v["body-mr"] },
-                imageId: imageId || null,
-                externalUrl: v.externalUrl || "",
-                approved: v.approved === "on",
-                published: v.published === "on",
-                sortOrder: Number(v.sortOrder),
-              };
-              try {
-                if (selected._id)
-                  await patch(`/admin/content/${selected._id}`, data);
-                else await post("/admin/content", data);
-                await qc.invalidateQueries({ queryKey: ["admin-content"] });
-                await qc.invalidateQueries({ queryKey: ["public-content"] });
-                setSelected(null);
-              } catch (e) {
-                setError((e as Error).message);
-              } finally {
-                setBusy(false);
-              }
-            }}
-          >
-            <label>
-              Content type
-              <select
-                name="kind"
-                aria-label="Content type"
-                defaultValue={selected.kind}
-              >
-                {[
-                  "banner",
-                  "about",
-                  "faq",
-                  "testimonial",
-                  "gallery",
-                  "video",
-                  "blog",
-                  "contact",
-                ].map((kind) => (
-                  <option key={kind}>{kind}</option>
-                ))}
-              </select>
-            </label>
-            <label>
-              URL slug
-              <input
-                name="slug"
-                defaultValue={selected.slug}
-                pattern="[a-z0-9]+(-[a-z0-9]+)*"
-                required
-                maxLength={100}
-              />
-            </label>
-            {["en", "hi", "mr"].map((lang) => (
-              <fieldset key={lang}>
-                <legend>
-                  {lang === "en"
-                    ? "English"
-                    : lang === "hi"
-                      ? "हिन्दी"
-                      : "मराठी"}
-                </legend>
-                <label>
-                  Title
-                  <input
-                    name={`title-${lang}`}
-                    required
-                    maxLength={300}
-                    defaultValue={selected.title[lang]}
-                  />
-                </label>
-                <label>
-                  Body
-                  <textarea
-                    rows={5}
-                    name={`body-${lang}`}
-                    maxLength={10000}
-                    defaultValue={selected.body[lang]}
-                  />
-                </label>
-              </fieldset>
-            ))}
-            <label>
-              Uploaded image ID
-              <input
-                value={imageId}
-                onChange={(e) => setImageId(e.target.value)}
-                pattern="[a-fA-F0-9]{24}"
-              />
-            </label>
-            <label>
-              External video / contact link (HTTPS)
-              <input
-                name="externalUrl"
-                type="url"
-                defaultValue={selected.externalUrl}
-              />
-            </label>
-            <label>
-              Display order
-              <input
-                name="sortOrder"
-                type="number"
-                min={0}
-                max={1000}
-                defaultValue={selected.sortOrder}
-              />
-            </label>
-            <label className="checkbox">
-              <input
-                name="approved"
-                type="checkbox"
-                defaultChecked={selected.approved}
-              />
-              I verified this content. Reviews are genuine and approved;
-              clinical educational content has been reviewed appropriately.
-            </label>
-            <label className="checkbox">
-              <input
-                name="published"
-                type="checkbox"
-                defaultChecked={selected.published}
-              />
-              Publish on the website
-            </label>
-            {error && (
-              <p role="alert" className="notice error">
-                {error}
-              </p>
-            )}
-            <button className="button" disabled={busy}>
-              {busy ? "Saving…" : "Save content"}
-            </button>
-          </form>
-        </dialog>
-      )}
+              <label>
+                Content type
+                <select
+                  name="kind"
+                  aria-label="Content type"
+                  defaultValue={selected.kind}
+                >
+                  {[
+                    "banner",
+                    "about",
+                    "faq",
+                    "testimonial",
+                    "gallery",
+                    "video",
+                    "blog",
+                    "contact",
+                  ].map((kind) => (
+                    <option key={kind}>{kind}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                URL slug
+                <input
+                  name="slug"
+                  defaultValue={selected.slug}
+                  pattern="[a-z0-9]+(-[a-z0-9]+)*"
+                  required
+                  maxLength={100}
+                />
+              </label>
+              {["en", "hi", "mr"].map((lang) => (
+                <fieldset key={lang}>
+                  <legend>
+                    {lang === "en"
+                      ? "English"
+                      : lang === "hi"
+                        ? "हिन्दी"
+                        : "मराठी"}
+                  </legend>
+                  <label>
+                    Title
+                    <input
+                      name={`title-${lang}`}
+                      required
+                      maxLength={300}
+                      defaultValue={selected.title[lang]}
+                    />
+                  </label>
+                  <label>
+                    Body
+                    <textarea
+                      rows={5}
+                      name={`body-${lang}`}
+                      maxLength={10000}
+                      defaultValue={selected.body[lang]}
+                    />
+                  </label>
+                </fieldset>
+              ))}
+              <label>
+                Uploaded image ID
+                <input
+                  value={imageId}
+                  onChange={(e) => setImageId(e.target.value)}
+                  pattern="[a-fA-F0-9]{24}"
+                />
+              </label>
+              <label>
+                External video / contact link (HTTPS)
+                <input
+                  name="externalUrl"
+                  type="url"
+                  defaultValue={selected.externalUrl}
+                />
+              </label>
+              <label>
+                Display order
+                <input
+                  name="sortOrder"
+                  type="number"
+                  min={0}
+                  max={1000}
+                  defaultValue={selected.sortOrder}
+                />
+              </label>
+              <label className="checkbox">
+                <input
+                  name="approved"
+                  type="checkbox"
+                  defaultChecked={selected.approved}
+                />
+                I verified this content. Reviews are genuine and approved;
+                clinical educational content has been reviewed appropriately.
+              </label>
+              <label className="checkbox">
+                <input
+                  name="published"
+                  type="checkbox"
+                  defaultChecked={selected.published}
+                />
+                Publish on the website
+              </label>
+              {error && (
+                <p role="alert" className="notice error">
+                  {error}
+                </p>
+              )}
+              <button className="button" disabled={busy}>
+                {busy ? "Saving…" : "Save content"}
+              </button>
+            </form>
+          </dialog>
+        )}
+      </details>
     </section>
   );
 }

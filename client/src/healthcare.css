@@ -968,7 +968,9 @@ html[lang="mr"] h1 {
   letter-spacing: 0.03em;
 }
 .company-reg-number {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
   font-size: clamp(1.25rem, 2.5vw, 1.6rem);
   font-weight: 800;
   color: #0f172a;
@@ -1066,3 +1068,29 @@ html[lang="mr"] h1 {
   margin-left: 6px;
 }
 
+.simple-enquiry-page {
+  max-width: 640px;
+}
+.simple-enquiry-page .form-grid {
+  grid-template-columns: 1fr;
+}
+.hc-enquiry-policy {
+  margin: 16px 0;
+  font-size: 0.9rem;
+}
+.hc-enquiry-policy summary {
+  cursor: pointer;
+  text-decoration: underline;
+}
+.owner-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin: 24px 0;
+}
+.owner-gallery-grid img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}

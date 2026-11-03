@@ -7,7 +7,7 @@ import AuthExperience from "./AuthExperience";
 import DashboardOverview from "./DashboardOverview";
 import { EmptyState } from "./Visual";
 import { ActionDialog } from "./ActionDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -36,6 +36,7 @@ import { services, areas } from "../../shared/catalog";
 type Row = Record<string, any>;
 const tabs = [
   ["Overview", LayoutDashboard],
+  ["Content", FileText],
   ["Bookings", ClipboardList],
   ["Inquiries", MessageSquare],
   ["Caregivers", Users],
@@ -46,7 +47,6 @@ const tabs = [
   ["Notifications", Bell],
   ["Team", Users],
   ["Services", Settings],
-  ["Content", FileText],
   ["Audit log", ShieldCheck],
   ["Settings", Settings],
 ] as const;
@@ -62,6 +62,14 @@ export default function Portal() {
   });
   const [tab, setTab] = useState("Overview");
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", close);
+    return () => document.removeEventListener("keydown", close);
+  }, [open]);
   const navigate = useNavigate();
   const qc = useQueryClient();
   if (isLoading) return <Loading />;
@@ -99,7 +107,14 @@ export default function Portal() {
   );
   return (
     <div className="portal-shell">
-      <aside className={`sidebar ${open ? "open" : ""}`}>
+      {open && (
+        <button
+          className="portal-menu-backdrop"
+          aria-label="Close portal menu"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      <aside id="portal-navigation" className={`sidebar ${open ? "open" : ""}`}>
         <Logo />
         <LanguageSwitcher />
         <p className="sidebar-label">{tr("YOUR CARE WORKSPACE")}</p>
@@ -111,10 +126,11 @@ export default function Portal() {
               onClick={() => {
                 setTab(t);
                 setOpen(false);
+                window.scrollTo({ top: 0, behavior: "instant" });
               }}
             >
               <Icon size={19} />
-              {tr(t)}
+              {t === "Content" ? "Photo gallery & website" : tr(t)}
             </button>
           ))}
         </nav>
@@ -147,6 +163,8 @@ export default function Portal() {
             className="menu-button icon-button"
             onClick={() => setOpen(!open)}
             aria-label="Toggle portal menu"
+            aria-expanded={open}
+            aria-controls="portal-navigation"
           >
             <Menu />
           </button>
@@ -158,8 +176,10 @@ export default function Portal() {
             <ArrowUpRight size={15} />
           </Link>
         </div>
-        <div className="portal-content">
-          <div className="portal-heading">
+        <div
+          className={`portal-content ${tab === "Content" ? "portal-gallery-content" : ""}`}
+        >
+          <div className="portal-heading" hidden={tab === "Content"}>
             <div>
               <p className="eyebrow">
                 {["owner", "operations", "accountant", "coordinator"].includes(
@@ -171,7 +191,9 @@ export default function Portal() {
               <h1>
                 {tab === "Overview"
                   ? `Welcome, ${user.name.split(" ")[0]}.`
-                  : tab}
+                  : tab === "Content"
+                    ? "Gallery & website"
+                    : tr(tab)}
               </h1>
               <p>
                 {tab === "Overview"

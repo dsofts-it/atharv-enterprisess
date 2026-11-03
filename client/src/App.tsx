@@ -43,6 +43,7 @@ const Contact = lazy(() =>
     default: module.HealthcareContact,
   })),
 );
+const Enquire = lazy(() => import("./Healthcare").then(module => ({ default: module.EnquiryPage })));
 const FindCare = lazy(() =>
   import("./Healthcare").then((module) => ({
     default: module.HealthcareGuide,
@@ -80,7 +81,7 @@ export default function App() {
             <Route path="/how-it-works" element={<HowItWorks />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/enquire" element={<Contact />} />
+            <Route path="/enquire" element={<Enquire />} />
             <Route path="/gallery" element={<HealthcareGallery />} />
             <Route path="/resources" element={<ResourcesPage />} />
             <Route

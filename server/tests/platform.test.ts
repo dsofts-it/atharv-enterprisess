@@ -227,6 +227,32 @@ describe("public access and authentication", () => {
     await Media.findByIdAndDelete(image.body.data.id);
     await Content.findByIdAndDelete(draft.body.data._id);
   });
+  it("allows only the owner to remove a gallery photo from public content", async () => {
+    const agent = request.agent(app);
+    await agent
+      .post("/api/v1/auth/login")
+      .send({ email: owner.email, password: "not-used-in-production" });
+    const photo = await Content.create({
+      kind: "gallery",
+      slug: "delete-test-photo",
+      title: { en: "Photo", hi: "Photo", mr: "Photo" },
+      body: { en: "", hi: "", mr: "" },
+      approved: true,
+      published: true,
+      sortOrder: 0,
+    });
+    const path = `/api/v1/admin/content/${photo._id}`;
+    expect((await request(app).delete(path)).status).toBe(401);
+    expect((await alice.delete(path)).status).toBe(403);
+    expect(await Content.findById(photo._id)).not.toBeNull();
+    expect((await agent.delete(path)).status).toBe(200);
+    const visible = (await request(app).get("/api/v1/public/content")).body
+      .data;
+    expect(visible.some((row: any) => row._id === String(photo._id))).toBe(
+      false,
+    );
+    expect((await agent.delete(path)).status).toBe(404);
+  });
   it("creates unpublished services and prevents duplicate published service photos", async () => {
     const agent = request.agent(app);
     await agent

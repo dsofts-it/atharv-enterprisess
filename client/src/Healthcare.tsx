@@ -1,3 +1,4 @@
+import UploadedGallery from "./UploadedGallery";
 import { CompanyDetails } from "./CompanyDetails";
 import { CarePhoto } from "./HealthcareLayout";
 import { PublicBlocks } from "./PublicContent";
@@ -11,7 +12,6 @@ import {
   HeartPulse,
   ShieldCheck,
   CalendarDays,
-  X,
   Phone,
   Check,
   Search,
@@ -1031,121 +1031,14 @@ export function HealthcareGuide() {
   );
 }
 export function HealthcareGallery() {
-  const { t, language } = useLanguage();
-  const [filter, setFilter] = useState("all");
-  const [active, setActive] = useState<Service | null>(null);
-  const { data: published = [] } = useServices();
+  const { t } = useLanguage();
   return (
-    <section className="container hc-section">
-      <p className="eyebrow">{t(copy.gallery)}</p>
-      <h1>
-        {t([
-          "A glimpse of care at home.",
-          "घर की देखभाल की एक झलक।",
-          "घरगुती देखभालीची एक झलक.",
-        ])}
-      </h1>
-      <p className="hc-lead">
-        {t([
-          "Company photographs and care illustrations.",
-          "कंपनी के चित्र और देखभाल के उदाहरण।",
-          "कंपनीची छायाचित्रे आणि देखभालीची उदाहरणे.",
-        ])}
-      </p>
-      <PublicBlocks kind="gallery" />
-      <p>
-        <Link to="/login">
-          {t([
-            "Owner login — manage gallery photos",
-            "मालिक लॉगिन — गैलरी के चित्र प्रबंधित करें",
-            "मालक लॉगिन — गॅलरीची छायाचित्रे व्यवस्थापित करा",
-          ])}
-        </Link>
-      </p>
-      <h2>
-        {t(["Care illustrations", "देखभाल के उदाहरण", "देखभालीची उदाहरणे"])}
-      </h2>
-      <p>{t(copy.ai)}</p>
-      <div className="hc-filters">
-        <div>
-          {[
-            ["all", copy.all],
-            ["clinical", copy.clinical],
-            ["everyday", copy.everyday],
-          ].map(([value, label]) => (
-            <button
-              key={value as string}
-              aria-pressed={filter === value}
-              className={filter === value ? "selected" : ""}
-              onClick={() => setFilter(value as string)}
-            >
-              {t(label as unknown as Copy)}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="hc-card-grid">
-        {published
-          .filter(
-            (s) =>
-              filter === "all" ||
-              (filter === "clinical" ? s.clinical : !s.clinical),
-          )
-          .map((s) => (
-            <button
-              className="hc-gallery-button"
-              key={s.slug}
-              onClick={() => setActive(s)}
-              aria-label={`${t(copy.details)}: ${serviceText(s, "name", language)}`}
-            >
-              <CarePhoto
-                slug={s.image || serviceContent[s.slug]?.image || s.slug}
-              />
-              <strong>{serviceText(s, "name", language)}</strong>
-            </button>
-          ))}
-      </div>
-      {active && (
-        <GalleryDialog service={active} close={() => setActive(null)} />
-      )}
+    <section className="container hc-section uploaded-gallery-page">
+      <header className="uploaded-gallery-heading">
+        <h1>{t(copy.gallery)}</h1>
+      </header>
+      <UploadedGallery />
     </section>
-  );
-}
-function GalleryDialog({
-  service,
-  close,
-}: {
-  service: Service;
-  close: () => void;
-}) {
-  const { t, language } = useLanguage();
-  return (
-    <dialog
-      className="hc-lightbox"
-      aria-labelledby="gallery-title"
-      ref={(element) => {
-        if (element && !element.open) element.showModal();
-      }}
-      onCancel={close}
-      onClick={(event) => {
-        if (event.target === event.currentTarget) close();
-      }}
-    >
-      <button
-        autoFocus
-        className="icon-button"
-        aria-label={t(["Close image", "चित्र बंद करें", "छायाचित्र बंद करा"])}
-        onClick={close}
-      >
-        <X />
-      </button>
-      <CarePhoto
-        slug={
-          service.image || serviceContent[service.slug]?.image || service.slug
-        }
-      />
-      <h2 id="gallery-title">{serviceText(service, "name", language)}</h2>
-    </dialog>
   );
 }
 export function ProcessPage() {
@@ -1164,5 +1057,9 @@ export function FAQPage() {
 }
 export function EnquiryPage() {
   const [params] = useSearchParams();
-  return <HealthcareContact key={params.get("service") || "general"} />;
+  return (
+    <section className="container hc-section simple-enquiry-page">
+      <EnquiryForm key={params.get("service") || "general"} />
+    </section>
+  );
 }

@@ -24,13 +24,9 @@ it("requires agreement and sends a dated named enquiry to the company WhatsApp w
   fireEvent.change(screen.getByLabelText("Mobile number"), {
     target: { value: "9876543210" },
   });
-  fireEvent.change(screen.getByLabelText("City / area"), {
-    target: { value: "Pune" },
+  fireEvent.change(screen.getByLabelText("Patient name"), {
+    target: { value: "Sample Patient" },
   });
-  fireEvent.change(
-    screen.getByLabelText("Care required / preferred dates and shift"),
-    { target: { value: "Day care" } },
-  );
   fireEvent.click(screen.getByRole("button"));
   expect(open).not.toHaveBeenCalled();
   fireEvent.click(screen.getByRole("checkbox"));
@@ -42,6 +38,9 @@ it("requires agreement and sends a dated named enquiry to the company WhatsApp w
   );
   expect(url.searchParams.get("text")).toContain("Date / time (IST)");
   expect(url.searchParams.get("text")).toContain("prior written approval");
+  expect(url.searchParams.get("text")).toContain(
+    "Patient name: Sample Patient",
+  );
   expect(fetcher).not.toHaveBeenCalled();
   expect(screen.getByRole("status").textContent).toContain(
     "only when you tap Send",
@@ -58,10 +57,8 @@ it.each(["hi", "mr"])(
         </MemoryRouter>
       </LanguageProvider>,
     );
-    expect(
-      screen.getByRole("combobox").getAttribute("value") ??
-        (screen.getByRole("combobox") as HTMLSelectElement).value,
-    ).toBe("professional");
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByLabelText("Patient name")).toBeNull();
     expect((screen.getByRole("checkbox") as HTMLInputElement).required).toBe(
       true,
     );

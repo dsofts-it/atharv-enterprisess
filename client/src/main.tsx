@@ -31,3 +31,5 @@ createRoot(document.getElementById("root")!).render(
 );
 import "./service-cards.css";
 import "./healthcare.css";
+
+import "./responsive-polish.css";

@@ -201,6 +201,23 @@ contentAdmin.patch(
     ok(res, row);
   }),
 );
+contentAdmin.delete(
+  "/content/:id",
+  wrap(async (req, res) => {
+    assert(
+      /^[a-f\d]{24}$/i.test(String(req.params.id)),
+      400,
+      "Invalid content ID",
+    );
+    const row = await Content.findOneAndDelete({
+      _id: req.params.id,
+      kind: "gallery",
+    });
+    assert(row, 404, "Gallery photo not found");
+    await audit(req.user._id, "gallery.deleted", String(row._id));
+    ok(res, { deleted: true });
+  }),
+);
 contentAdmin.post(
   "/media",
   wrap(async (req, res) => {
@@ -209,7 +226,7 @@ contentAdmin.post(
         base64: z.string().max(2100000),
         alt: translated,
         illustrative: z.boolean(),
-        consent: z.literal(true),
+        consent: z.literal(true).optional(),
       })
       .strict()
       .parse(req.body);

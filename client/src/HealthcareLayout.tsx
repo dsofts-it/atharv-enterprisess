@@ -326,12 +326,6 @@ export function HealthcareFooter() {
 export function QuickContact() {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const { data: s } = useQuery({
-    queryKey: ["settings"],
-    queryFn: () => api("/public/settings"),
-  });
-  const digits = s?.whatsapp?.replace(/\D/g, "");
-  const number = digits?.length === 10 ? `91${digits}` : digits;
   return (
     <div className="hc-quick">
       {open && (

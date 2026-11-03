@@ -6,7 +6,7 @@ import { careAgreement, enquiryWhatsAppUrl } from "./enquiryWhatsApp";
 export function EnquiryForm({ careers = false }: { careers?: boolean }) {
   const { t, language } = useLanguage();
   const [params] = useSearchParams();
-  const [role, setRole] = useState(careers ? "professional" : "client");
+  const role = careers ? "professional" : "client";
   const [draft, setDraft] = useState("");
   const roleLabel =
     role === "client"
@@ -34,8 +34,14 @@ export function EnquiryForm({ careers = false }: { careers?: boolean }) {
           `${t(["Enquiry from", "पूछताछ करने वाला", "चौकशी करणारे"])}: ${roleLabel}`,
           `${t(["Full name", "पूरा नाम", "पूर्ण नाव"])}: ${String(data.get("name")).trim()}`,
           `${t(["Mobile", "मोबाइल", "मोबाईल"])}: ${data.get("phone")}`,
-          `${t(["City / area", "शहर / क्षेत्र", "शहर / परिसर"])}: ${String(data.get("area")).trim()}`,
-          `${t(["Requirements / experience", "आवश्यकताएँ / अनुभव", "गरजा / अनुभव"])}: ${String(data.get("details")).trim()}`,
+          ...(careers
+            ? []
+            : [
+                `${t(["Patient name", "मरीज का नाम", "रुग्णाचे नाव"])}: ${String(data.get("patientName")).trim()}`,
+              ]),
+          ...(careers
+            ? [`Experience: ${String(data.get("details")).trim()}`]
+            : []),
           "",
           careAgreement[{ en: 0, hi: 1, mr: 2 }[language]],
           "",
@@ -60,27 +66,12 @@ export function EnquiryForm({ careers = false }: { careers?: boolean }) {
       </h2>
       <p>
         {t([
-          "For clients, families and nursing / care professionals. Your details go to our company WhatsApp: 8803602030. Tap Send in WhatsApp to complete your enquiry.",
+          "Fill in your details, agree, and open WhatsApp. Tap Send there to finish.",
           "ग्राहकों, परिवारों और नर्सिंग / देखभाल कर्मियों के लिए। जानकारी कंपनी के व्हाट्सएप 8803602030 पर जाएगी। पूछताछ पूरी करने के लिए व्हाट्सएप में भेजें दबाएँ।",
           "ग्राहक, कुटुंबे आणि नर्सिंग / देखभाल कर्मचाऱ्यांसाठी. माहिती कंपनीच्या व्हॉट्सॲप 8803602030 वर जाईल. चौकशी पूर्ण करण्यासाठी व्हॉट्सॲपमध्ये पाठवा दाबा.",
         ])}
       </p>
       <div className="form-grid">
-        <label>
-          {t(["I am a", "मैं हूँ", "मी आहे"])}
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="client">
-              {t(["Client / family", "ग्राहक / परिवार", "ग्राहक / कुटुंब"])}
-            </option>
-            <option value="professional">
-              {t([
-                "Nursing / care professional",
-                "नर्सिंग / देखभाल कर्मी",
-                "नर्सिंग / देखभाल कर्मचारी",
-              ])}
-            </option>
-          </select>
-        </label>
         <label>
           {t(["Full name", "पूरा नाम", "पूर्ण नाव"])}
           <input
@@ -104,38 +95,35 @@ export function EnquiryForm({ careers = false }: { careers?: boolean }) {
             placeholder="8803602030"
           />
         </label>
+        {!careers && (
+          <label>
+            {t(["Patient name", "मरीज का नाम", "रुग्णाचे नाव"])}
+            <input
+              name="patientName"
+              required
+              minLength={2}
+              maxLength={100}
+              pattern=".*\S.*"
+            />
+          </label>
+        )}
+      </div>
+      {careers && (
         <label>
-          {t(["City / area", "शहर / क्षेत्र", "शहर / परिसर"])}
-          <input
-            name="area"
-            autoComplete="address-level2"
+          {t([
+            "Experience and availability",
+            "अनुभव और उपलब्धता",
+            "अनुभव आणि उपलब्धता",
+          ])}
+          <textarea
+            name="details"
+            rows={3}
             required
-            maxLength={180}
-            defaultValue={params.get("locality") || ""}
-            pattern=".*\S.*"
+            maxLength={1000}
+            defaultValue={params.get("service") || ""}
           />
         </label>
-      </div>
-      <label>
-        {role === "client"
-          ? t([
-              "Care required / preferred dates and shift",
-              "आवश्यक देखभाल / पसंदीदा तारीख और शिफ्ट",
-              "आवश्यक देखभाल / पसंतीच्या तारखा आणि पाळी",
-            ])
-          : t([
-              "Qualifications, experience and availability",
-              "योग्यता, अनुभव और उपलब्धता",
-              "पात्रता, अनुभव आणि उपलब्धता",
-            ])}
-        <textarea
-          name="details"
-          rows={4}
-          required
-          maxLength={1000}
-          defaultValue={params.get("service") || ""}
-        />
-      </label>
+      )}
       <p className="hc-form-note">
         {t([
           "Please do not include medical records, identity numbers or confidential health information.",
@@ -143,21 +131,21 @@ export function EnquiryForm({ careers = false }: { careers?: boolean }) {
           "कृपया वैद्यकीय नोंदी, ओळख क्रमांक किंवा गोपनीय आरोग्य माहिती देऊ नका.",
         ])}
       </p>
-      <aside className="notice">
-        <h3>
+      <details className="hc-enquiry-policy">
+        <summary>
           {t([
             "Client & care professional policy",
             "ग्राहक और देखभाल कर्मी नीति",
             "ग्राहक व देखभाल कर्मचारी धोरण",
           ])}
-        </h3>
+        </summary>
         <p>{t(careAgreement)}</p>
-      </aside>
+      </details>
       <label className="checkbox">
         <input name="agreement" type="checkbox" required />
         <span>
           {t([
-            "I agree to the policy above, confirm my name and consent to being contacted about this enquiry.",
+            "I agree to the policy and to being contacted about this enquiry.",
             "मैं उपरोक्त नीति से सहमत हूँ, अपने नाम की पुष्टि करता/करती हूँ और इस पूछताछ के बारे में संपर्क की सहमति देता/देती हूँ।",
             "वरील धोरणाशी मी सहमत आहे, माझ्या नावाची पुष्टी करतो/करते आणि या चौकशीबद्दल संपर्कासाठी संमती देतो/देते.",
           ])}{" "}
@@ -168,7 +156,7 @@ export function EnquiryForm({ careers = false }: { careers?: boolean }) {
       </label>
       <button className="button full" type="submit">
         {t([
-          "I agree — continue to WhatsApp",
+          "Submit on WhatsApp",
           "मैं सहमत हूँ — व्हाट्सएप खोलें",
           "मी सहमत आहे — व्हॉट्सॲप उघडा",
         ])}
